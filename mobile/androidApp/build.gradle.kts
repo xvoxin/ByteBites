@@ -27,8 +27,12 @@ android {
         applicationId = "pl.bytebites.mobile"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+
+        val major = libs.versions.app.version.major.get().toInt()
+        val minor = libs.versions.app.version.minor.get().toInt()
+
+        versionCode = major * 100 + minor
+        versionName = "$major.$minor"
     }
     packaging {
         resources {
