@@ -1,79 +1,92 @@
-# Architektura Projektu ByteBites
+# ByteBites Mobile Architecture Guidelines
 
-Dokument zawiera zasady architektoniczne, wzorce projektowe oraz dobre praktyki obowiązujące w projekcie **ByteBites (KMP)**. Dokument jest żywy i rozwijany wraz z kolejnymi ustaleniami.
-
----
-
-## 🛠️ Zastosowane Wzorce i Zasady
-
-### 1. Clean Architecture & Zagnieżdżone Moduły Gradle
-Podział aplikacji na czyste warstwy reprezentowane przez osobne moduły i podmoduły Gradle:
-- **`:domain`** – czysta logika biznesowa (Use Cases / Interactors / Providers / Creators), modele domenowe, interfejsy repozytoriów. Moduł nie posiada żadnych zależności od Androida, Ktor czy Compose.
-- **`:data:network`** – komunikacja z API, klient HTTP (Ktor), DTOs, serializacja JSON, obsługa błędów sieciowych.
-- **`:data:repository`** – warstwa integracji i zarządzania danymi. Zależy od `:domain` oraz `:data:network`. Implementuje interfejsy z `:domain` (np. `InMemoryRecipeRepository`, `KtorRecipeRepository`).
-- **`:shared` (Presentation Layer)** – warstwa UI (Compose Multiplatform), ViewModele (MVI), Interactory prezentacji, komponenty widokowe.
-- **`:androidApp` / `:iosApp`** – aplikacje uruchomieniowe (entry point dla danych platform).
+This document defines the architectural principles, design patterns, and engineering standards for the **ByteBites (KMP)** mobile client.
 
 ---
 
-### 2. Warstwa Prezentacji: Pakiety, Interactory i Formatowanie
+## 🛠️ Architecture & Design Principles
 
-#### A) Struktura Pakietów w Funkcjach Prezentacji (`presentation/feature/`)
-Każdy moduł funkcjonalny w warstwie prezentacji posiada twardo zdefiniowaną strukturę pakietów:
-- **`view`** – widoki Compose (`FeedScreen`, `FeedHeader`, `RecipeListItemCard`). Brak pakietu `ui`!
-- **`viewmodel`** – ViewModele. Każda klasa w osobnym pliku!
-  - Abstrakcja: `FeedViewModel.kt`
-  - Implementacja: `FeedScreenViewModel.kt`
-  - Atrapa: `FakeFeedViewModel.kt`
-- **`model`** – stany MVI, intencje, efekty uboczne oraz modele UI i maperzy (`FeedState`, `FeedIntent`, `FeedEffect`, `RecipeUiModel`, `RecipeMapper`).
-- **`interactor`** – Interactory prezentacji (`FeedProvider.kt`, `FeedProviderInteractor.kt`).
+### 1. Clean Architecture & Nested Gradle Multi-Modularity
+The application is strictly partitioned into Clean Architecture layers using nested Gradle modules (without redundant `:core` nesting):
+- **`:domain`**: Pure Kotlin Multiplatform code containing business logic, domain models, repository interfaces, and role-based domain components (`Provider`, `Creator`, `Deleter`, `Authenticator`). Zero dependencies on Android, iOS, Ktor, or Compose.
+- **`:data:network`**: API communication, Ktor HTTP client, DTOs, JSON serialization, and network error handling.
+- **`:data:repository`**: Data integration layer depending on `:domain` and `:data:network` (and future `:data:database`). Implements repository interfaces defined in `:domain` (e.g., `InMemoryRecipeRepository`, `KtorRecipeRepository`) and maps DTOs to domain models.
+- **`:shared` (Presentation Layer)**: UI (Compose Multiplatform), ViewModels (MVI), presentation interactors, and view components. Depends on `:domain` and `:data:repository`.
+- **`:androidApp` / `:iosApp`**: Platform entry points.
 
-#### B) Konwencja Stanu MVI w ViewModelu (Brak `_state`)
-- W konkretnym ViewModelu nie tworzymy sztucznych dwóch zmiennych `_state` i `state`.
-- Nadpisujemy właściwość bezpośrednio:
+---
+
+### 2. Presentation Layer Standards: Package Structure, Interactors, and Formatting
+
+#### A) Feature Package Structure (`presentation/feature/`)
+Every feature in the presentation layer must strictly follow this package layout:
+- **`view`**: Compose views (`FeedScreen`, `FeedHeader`, `RecipeListItemCard`). The package name `ui` is strictly forbidden!
+- **`viewmodel`**: ViewModels. Each ViewModel class must reside in its own separate file!
+  - Abstract ViewModel: `FeedViewModel.kt`
+  - Screen ViewModel: `FeedScreenViewModel.kt`
+  - Fake ViewModel for previews: `FakeFeedViewModel.kt`
+- **`model`**: MVI States, Intents, Effects, UI models, and mappers (`FeedState`, `FeedIntent`, `FeedEffect`, `Recipe`, `RecipeMapper`).
+- **`interactor`**: Presentation interactors (`FeedProvider.kt`, `FeedProviderInteractor.kt`).
+
+#### B) Single State Flow Pattern (No `_state` Duplication)
+- Concrete ViewModels must not duplicate `_state` and `state` fields.
+- Directly override the state property:
   `override val state = MutableStateFlow(FeedState())`
-- Wewnątrz klasy operujemy bezpośrednio na `state.update { ... }` lub `state.value = ...`.
+- Mutate state directly using `state.update { ... }` or `state.value = ...`.
 
-#### C) Interactor Prezentacji & Nazewnictwo
-- **Domena NIE MOŻE trafiać bezpośrednio do ViewModelu!**
-- ViewModel wstrzykuje interfejs `FeedProvider` z warstwy prezentacji.
-- Implementacja `FeedProviderInteractor` wstrzykuje domenowego dostawcę (z aliasem `import pl.bytebites.mobile.domain.provider.RecipeProvider as DomainRecipeProvider`), wywołuje go, mapuje `Recipe` na `RecipeUiModel` i zwraca do ViewModelu.
+#### C) Presentation Interactor & Naming Conventions
+- **Domain components MUST NOT be injected directly into ViewModels!**
+- ViewModels inject presentation interactor interfaces (e.g., `FeedProvider`).
+- Interactor implementations (e.g., `FeedProviderInteractor`) inject domain components (aliased as `import pl.bytebites.mobile.domain.provider.RecipeProvider as DomainRecipeProvider`), invoke domain operations, map domain models to presentation `Recipe` models, and expose them to the ViewModel.
 
-#### D) Stałe w Widokach Compose (`.dp` / `.sp`)
-- **Żadnych zahardkodowanych wartości liczbowych (`16.dp`, `24.dp`, `28.sp`) wewnątrz funkcji `@Composable`!**
-- Wszystkie stałe wymiarowe deklarujemy na samej górze pliku z rozszerzeniem `.dp` / `.sp`:
+#### D) UI Dimension Constants (`.dp` / `.sp`)
+- **Raw numbers (`16.dp`, `24.dp`, `28.sp`) inside `@Composable` functions are strictly forbidden!**
+- All UI dimensions must be declared at the top of the file using extension properties:
   ```kotlin
   private val HEADER_ELEVATION = 6.dp
   private val EMBLEM_SIZE = 56.dp
   private val EMBLEM_EMOJI_SIZE = 28.sp
   ```
 
-#### E) Formatowanie i Style Kodu (Code Style Rules)
-- **W nawiasach konstruktora `(...)` NIE dodajemy pustych linii.**
-- **W ciele klasy `{ ... }` dodajemy pustą linię po otwarciu klamry i przed jej zamknięciem.**
-- Oddzielamy pustą linią sekcję właściwości/zmiennych od sekcji metod.
+#### E) Code Formatting Rules
+- **No empty lines inside constructor parentheses `(...)`.**
+- **Class bodies `{ ... }` must include an empty line after the opening brace and before the closing brace.**
+- Separate property declarations and functions with an empty line.
 
 ---
 
-### 3. Abstrakcje i Dependency Injection (Koin)
-- **Koin** jest używany jako framework DI w KMP.
-- **Każda wstrzykiwana klasa musi posiadać swoją abstrakcję / interfejs**.
-- **Zakaz używania sufiksu `Impl` w nazwach klas!**
-  - *Zamiast:* `RecipeRepositoryImpl`
-  - *Stosujemy opisowe nazwy techniczne:* `InMemoryRecipeRepository`, `FeedProviderInteractor`, `FeedScreenViewModel`.
+### 3. Abstractions & Dependency Injection (Koin)
+- **Koin** is the primary DI framework for KMP.
+- **Every injected class must implement an interface / abstraction.**
+- **The `Impl` class suffix is strictly prohibited!**
+  - *Forbidden:* `RecipeRepositoryImpl`
+  - *Required:* Descriptive technical names like `InMemoryRecipeRepository`, `FeedProviderInteractor`, `FeedScreenViewModel`.
 
 ---
 
-### 4. SOLID & Single Responsibility Principle (SRP)
-- Klasy robią wyłącznie to, na co wskazuje ich nazwa.
+### 4. Solid Unit Testing Strategy 🧪
+- Thorough unit test coverage across all layers:
+  - **`:domain` unit tests**: Testing role-based domain components (`RecipeCreator`, `RecipeProvider`, `RecipeDeleter`).
+  - **`:shared` unit tests**: Testing ViewModels and presentation interactors (using **Turbine** for `StateFlow`).
+  - **`:data:repository` & `:data:network` unit tests**: Testing repositories, data mappers, and API clients.
 
 ---
 
-## 🤝 Zasady Współpracy & Workflow AI
+### 5. SOLID & Single Responsibility Principle (SRP)
+- Classes must fulfill a single, well-defined responsibility matching their name.
 
-1. **Partnerstwo i Krytyczne Podejście**:
-   - Jako asystent AI nie zgadzam się bezrefleksyjnie ze wszystkimi pomysłami.
-2. **Potwierdzenie Przed Każdą Implementacją**:
-   - Przed wykonaniem jakiejkolwiek zmiany w kodzie, przedstawiam plan i **wymagam Twojego wyraźnego potwierdzenia**.
-3. **Aktualizacja Dokumentu**:
-   - Po nowych ustaleniach pytam o zgodę na zaktualizowanie pliku `architecture.md`.
+---
+
+### 6. Small, Composable UI Components
+- Monolithic views are strictly prohibited. Views are decomposed into small, reusable components in the `view` package.
+
+---
+
+## 🤝 Collaboration & AI Workflow
+
+1. **Constructive Partnership & Critical Feedback**:
+   - The AI assistant provides objective, architectural analysis and constructive criticism rather than blindly agreeing.
+2. **Explicit User Approval Before Implementation**:
+   - Before executing code changes, the AI presents a clear plan and **requires explicit user confirmation**.
+3. **Docs-as-Code Maintenance**:
+   - Architectural decisions are kept updated in `architecture.md` and `/docs`.
