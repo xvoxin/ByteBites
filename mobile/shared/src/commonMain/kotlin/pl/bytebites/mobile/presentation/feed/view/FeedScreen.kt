@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collectLatest
 import pl.bytebites.mobile.presentation.feed.model.FeedEffect
 import pl.bytebites.mobile.presentation.feed.model.FeedIntent
@@ -27,13 +26,7 @@ import pl.bytebites.mobile.presentation.feed.model.FeedState
 import pl.bytebites.mobile.presentation.feed.model.Recipe
 import pl.bytebites.mobile.presentation.feed.viewmodel.FeedViewModel
 import pl.bytebites.mobile.presentation.theme.CookbookTheme
-
-private val PROGRESS_PADDING = 24.dp
-private val LIST_PADDING_HORIZONTAL = 16.dp
-private val LIST_PADDING_VERTICAL = 8.dp
-private val SECTION_TITLE_PADDING_HORIZONTAL = 4.dp
-private val SECTION_TITLE_PADDING_VERTICAL = 8.dp
-private val CARD_SPACER_VERTICAL = 6.dp
+import pl.bytebites.mobile.presentation.theme.Dimen
 
 @Composable
 fun FeedScreen(
@@ -80,7 +73,7 @@ fun FeedContent(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(PROGRESS_PADDING),
+                            .padding(Dimen.Margin_3),
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -99,8 +92,8 @@ fun FeedContent(
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(
-                            horizontal = LIST_PADDING_HORIZONTAL,
-                            vertical = LIST_PADDING_VERTICAL
+                            horizontal = Dimen.Margin_2,
+                            vertical = Dimen.Margin_1
                         )
                     ) {
                         item {
@@ -111,8 +104,8 @@ fun FeedContent(
                                     color = MaterialTheme.colorScheme.onBackground
                                 ),
                                 modifier = Modifier.padding(
-                                    horizontal = SECTION_TITLE_PADDING_HORIZONTAL,
-                                    vertical = SECTION_TITLE_PADDING_VERTICAL
+                                    horizontal = Dimen.Margin_05,
+                                    vertical = Dimen.Margin_1
                                 )
                             )
                         }
@@ -121,7 +114,7 @@ fun FeedContent(
                             items = state.recipes,
                             key = { recipe -> recipe.id }
                         ) { recipe ->
-                            Box(modifier = Modifier.padding(vertical = CARD_SPACER_VERTICAL)) {
+                            Box(modifier = Modifier.padding(vertical = Dimen.Margin_075)) {
                                 RecipeListItemCard(
                                     recipe = recipe,
                                     onClick = { onIntent(FeedIntent.RecipeClicked(recipe.id)) }

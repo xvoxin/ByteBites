@@ -20,20 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import pl.bytebites.mobile.presentation.theme.Dimen
 
-private val HEADER_MARGIN = 16.dp
-private val CARD_CORNER_RADIUS = 24.dp
-private val HEADER_ELEVATION = 6.dp
-private val CONTENT_PADDING = 20.dp
-private val EMBLEM_SIZE = 56.dp
-private val EMBLEM_EMOJI_SIZE = 28.sp
-private val SPACER_HEIGHT = 10.dp
 private val TITLE_LETTER_SPACING = 1.sp
 private val SUBTITLE_LETTER_SPACING = 2.sp
-private val SMALL_SPACER_HEIGHT = 4.dp
-private val CONTAINER_ALPHA = 0.4f
+private const val CONTAINER_ALPHA = 0.4f
 
 @Composable
 fun FeedHeader(
@@ -43,31 +35,31 @@ fun FeedHeader(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(HEADER_MARGIN),
-        shape = RoundedCornerShape(CARD_CORNER_RADIUS),
+            .padding(Dimen.Margin_2),
+        shape = RoundedCornerShape(Dimen.RadiusXLarge),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = HEADER_ELEVATION)
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimen.ElevationHigh)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = CONTAINER_ALPHA))
-                .padding(CONTENT_PADDING),
+                .padding(Dimen.Margin_2_5),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
-                    .size(EMBLEM_SIZE)
+                    .size(Dimen.EmblemSize)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "📖", fontSize = EMBLEM_EMOJI_SIZE)
+                Text(text = "📖", fontSize = Dimen.TextSize_4_5)
             }
 
-            Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+            Spacer(modifier = Modifier.height(Dimen.Margin_1_25))
 
             Text(
                 text = "ByteBites",
@@ -87,7 +79,7 @@ fun FeedHeader(
                 )
             )
 
-            Spacer(modifier = Modifier.height(SMALL_SPACER_HEIGHT))
+            Spacer(modifier = Modifier.height(Dimen.Margin_05))
 
             Text(
                 text = "$totalRecipesCount wspaniałych przepisów gotowych do odkrycia",

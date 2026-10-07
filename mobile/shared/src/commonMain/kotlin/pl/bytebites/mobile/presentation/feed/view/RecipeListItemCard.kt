@@ -24,24 +24,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import pl.bytebites.mobile.presentation.feed.model.Recipe
+import pl.bytebites.mobile.presentation.theme.Dimen
 
-private val CARD_CORNER_RADIUS = 16.dp
-private val BORDER_THICKNESS = 1.dp
-private val BORDER_ALPHA = 0.5f
-private val CONTENT_PADDING = 14.dp
-private val EMOJI_BOX_SIZE = 52.dp
-private val EMOJI_BOX_CORNER_RADIUS = 14.dp
-private val EMOJI_CONTAINER_ALPHA = 0.6f
-private val EMOJI_FONT_SIZE = 28.sp
-private val TITLE_SPACER_WIDTH = 14.dp
-private val SUBTITLE_SPACER_HEIGHT = 6.dp
-private val META_SPACING = 10.dp
-private val META_ICON_FONT_SIZE = 11.sp
-private val META_TEXT_FONT_SIZE = 11.sp
-private val META_TEXT_SPACER_WIDTH = 3.dp
+private const val BORDER_ALPHA = 0.5f
+private const val EMOJI_CONTAINER_ALPHA = 0.6f
 
 @Composable
 fun RecipeListItemCard(
@@ -53,29 +40,29 @@ fun RecipeListItemCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        shape = RoundedCornerShape(CARD_CORNER_RADIUS),
+        shape = RoundedCornerShape(Dimen.RadiusLarge),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        border = BorderStroke(BORDER_THICKNESS, MaterialTheme.colorScheme.outline.copy(alpha = BORDER_ALPHA))
+        border = BorderStroke(Dimen.BorderThin, MaterialTheme.colorScheme.outline.copy(alpha = BORDER_ALPHA))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(CONTENT_PADDING),
+                .padding(Dimen.Margin_1_75),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(EMOJI_BOX_SIZE)
-                    .clip(RoundedCornerShape(EMOJI_BOX_CORNER_RADIUS))
+                    .size(Dimen.EmblemBoxSize)
+                    .clip(RoundedCornerShape(Dimen.RadiusMedium))
                     .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = EMOJI_CONTAINER_ALPHA)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = recipe.emoji, fontSize = EMOJI_FONT_SIZE)
+                Text(text = recipe.emoji, fontSize = Dimen.TextSize_4_5)
             }
 
-            Spacer(modifier = Modifier.width(TITLE_SPACER_WIDTH))
+            Spacer(modifier = Modifier.width(Dimen.Margin_1_75))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -94,10 +81,10 @@ fun RecipeListItemCard(
                     color = MaterialTheme.colorScheme.primary
                 )
 
-                Spacer(modifier = Modifier.height(SUBTITLE_SPACER_HEIGHT))
+                Spacer(modifier = Modifier.height(Dimen.Margin_075))
 
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(META_SPACING),
+                    horizontalArrangement = Arrangement.spacedBy(Dimen.Margin_1_25),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     MetaItem(icon = "⏱️", text = recipe.prepTime)
@@ -112,11 +99,11 @@ fun RecipeListItemCard(
 @Composable
 private fun MetaItem(icon: String, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = icon, fontSize = META_ICON_FONT_SIZE)
-        Spacer(modifier = Modifier.width(META_TEXT_SPACER_WIDTH))
+        Text(text = icon, fontSize = Dimen.TextSize_05)
+        Spacer(modifier = Modifier.width(Dimen.Margin_025))
         Text(
             text = text,
-            fontSize = META_TEXT_FONT_SIZE,
+            fontSize = Dimen.TextSize_05,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Medium
         )

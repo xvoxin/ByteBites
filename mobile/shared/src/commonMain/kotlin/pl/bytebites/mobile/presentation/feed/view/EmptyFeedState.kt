@@ -13,12 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-
-private val CONTAINER_PADDING = 32.dp
-private val EMOJI_SIZE = 48.sp
-private val SPACER_HEIGHT = 12.dp
+import pl.bytebites.mobile.presentation.theme.Dimen
 
 @Composable
 fun EmptyFeedState(
@@ -28,13 +23,13 @@ fun EmptyFeedState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(CONTAINER_PADDING),
+            .padding(Dimen.Margin_4),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "🍽️", fontSize = EMOJI_SIZE)
+        Text(text = "🍽️", fontSize = Dimen.TextSize_6)
 
-        Spacer(modifier = Modifier.height(SPACER_HEIGHT))
+        Spacer(modifier = Modifier.height(Dimen.Margin_1_5))
 
         Text(
             text = message,
