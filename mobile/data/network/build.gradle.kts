@@ -6,6 +6,8 @@ plugins {
 }
 
 kotlin {
+    jvm()
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -23,6 +25,9 @@ kotlin {
 
         compilerOptions {
             jvmTarget = JvmTarget.JVM_11
+        }
+        withHostTest {
+            isIncludeAndroidResources = true
         }
     }
 
