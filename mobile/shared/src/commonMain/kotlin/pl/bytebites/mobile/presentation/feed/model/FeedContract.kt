@@ -1,11 +1,9 @@
 package pl.bytebites.mobile.presentation.feed.model
 
 data class FeedState(
-
     val recipes: List<Recipe> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null
-
 )
 
 sealed interface FeedIntent {

@@ -9,10 +9,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import pl.bytebites.mobile.domain.model.Recipe
 import pl.bytebites.mobile.domain.provider.RecipeProvider
-import pl.bytebites.mobile.presentation.feed.interactor.DefaultFeedInteractor
+import pl.bytebites.mobile.presentation.feed.interactor.FeedProviderInteractor
 import pl.bytebites.mobile.presentation.feed.model.FeedEffect
 import pl.bytebites.mobile.presentation.feed.model.FeedIntent
-import pl.bytebites.mobile.presentation.feed.viewmodel.DefaultFeedViewModel
+import pl.bytebites.mobile.presentation.feed.viewmodel.FeedScreenViewModel
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -43,16 +43,16 @@ class DefaultFeedViewModelTest {
 
     private lateinit var repository: FakeRecipeRepository
     private lateinit var recipeProvider: RecipeProvider
-    private lateinit var interactor: DefaultFeedInteractor
-    private lateinit var viewModel: DefaultFeedViewModel
+    private lateinit var interactor: FeedProviderInteractor
+    private lateinit var viewModel: FeedScreenViewModel
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = FakeRecipeRepository(sampleRecipes)
         recipeProvider = RecipeProvider(repository)
-        interactor = DefaultFeedInteractor(recipeProvider)
-        viewModel = DefaultFeedViewModel(interactor)
+        interactor = FeedProviderInteractor(recipeProvider)
+        viewModel = FeedScreenViewModel(interactor)
     }
 
     @AfterTest

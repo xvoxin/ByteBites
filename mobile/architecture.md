@@ -22,22 +22,22 @@ The application is strictly partitioned into Clean Architecture layers using nes
 Every feature in the presentation layer must strictly follow this package layout:
 - **`view`**: Compose views (`FeedScreen`, `FeedHeader`, `RecipeListItemCard`). The package name `ui` is strictly forbidden!
 - **`viewmodel`**: ViewModels. Each ViewModel class must reside in its own separate file!
-  - Abstract ViewModel: `FeedViewModel.kt`
-  - Screen ViewModel: `FeedScreenViewModel.kt`
-  - Fake ViewModel for previews: `FakeFeedViewModel.kt`
-- **`model`**: MVI States, Intents, Effects, UI models, and mappers (`FeedState`, `FeedIntent`, `FeedEffect`, `Recipe`, `RecipeMapper`).
-- **`interactor`**: Presentation interactors (`FeedProvider.kt`, `FeedProviderInteractor.kt`).
+  - Abstract ViewModel: `RecipeDetailViewModel.kt`
+  - Screen ViewModel: `RecipeDetailScreenViewModel.kt`
+  - Fake ViewModel for previews: `FakeRecipeDetailViewModel.kt`
+- **`model`**: MVI States, Intents, Effects, UI models, and mappers (`RecipeDetailState`, `RecipeDetailIntent`, `RecipeDetailEffect`, `RecipeDetail`, `RecipeDetailMapper`).
+- **`interactor`**: Presentation interactors (`RecipeDetailProvider.kt`, `RecipeDetailProviderInteractor.kt`).
 
 #### B) Single State Flow Pattern (No `_state` Duplication)
 - Concrete ViewModels must not duplicate `_state` and `state` fields.
 - Directly override the state property:
-  `override val state = MutableStateFlow(FeedState())`
+  `override val state = MutableStateFlow(RecipeDetailState())`
 - Mutate state directly using `state.update { ... }` or `state.value = ...`.
 
 #### C) Presentation Interactor & Naming Conventions
 - **Domain components MUST NOT be injected directly into ViewModels!**
-- ViewModels inject presentation interactor interfaces (e.g., `FeedProvider`).
-- Interactor implementations (e.g., `FeedProviderInteractor`) inject domain components (aliased as `import pl.bytebites.mobile.domain.provider.RecipeProvider as DomainRecipeProvider`), invoke domain operations, map domain models to presentation `Recipe` models, and expose them to the ViewModel.
+- ViewModels inject presentation interactor interfaces (e.g., `RecipeDetailProvider`).
+- Interactor implementations (e.g., `RecipeDetailProviderInteractor`) inject domain components (aliased as `import pl.bytebites.mobile.domain.provider.RecipeDetailsProvider as DomainRecipeDetailsProvider`), invoke domain operations, map domain models to presentation `RecipeDetail` models, and expose them to the ViewModel.
 
 #### D) UI Dimension Constants (`.dp` / `.sp`)
 - **Raw numbers (`16.dp`, `24.dp`, `28.sp`) inside `@Composable` functions are strictly forbidden!**
@@ -48,8 +48,15 @@ Every feature in the presentation layer must strictly follow this package layout
   private val EMBLEM_EMOJI_SIZE = 28.sp
   ```
 
-#### E) Code Formatting Rules
-- **No empty lines inside constructor parentheses `(...)`.**
+#### E) Code Formatting & Function Syntax Rules
+- **No empty lines inside constructor parentheses `(...)` in classes or data classes.**
+- **Single-expression functions returning immediately must use the expression body (`=`) syntax:**
+  ```kotlin
+  override fun getRecipeById(id: String): Flow<RecipeDetail?> =
+      recipeDetailsProvider.getRecipeById(id).map { domainRecipe ->
+          domainRecipe?.toDetailPresentation()
+      }
+  ```
 - **Class bodies `{ ... }` must include an empty line after the opening brace and before the closing brace.**
 - Separate property declarations and functions with an empty line.
 
@@ -60,7 +67,7 @@ Every feature in the presentation layer must strictly follow this package layout
 - **Every injected class must implement an interface / abstraction.**
 - **The `Impl` class suffix is strictly prohibited!**
   - *Forbidden:* `RecipeRepositoryImpl`
-  - *Required:* Descriptive technical names like `InMemoryRecipeRepository`, `FeedProviderInteractor`, `FeedScreenViewModel`.
+  - *Required:* Descriptive technical names like `InMemoryRecipeRepository`, `RecipeDetailProviderInteractor`, `RecipeDetailScreenViewModel`.
 
 ---
 

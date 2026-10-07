@@ -10,10 +10,9 @@ class FeedProviderInteractor(
     private val recipeProvider: DomainRecipeProvider
 ) : FeedProvider {
 
-    override fun getRecipes(): Flow<List<Recipe>> {
-        return recipeProvider.getRecipes().map { list ->
+    override fun getRecipes(): Flow<List<Recipe>> =
+        recipeProvider.getRecipes().map { list ->
             list.map { it.toPresentation() }
         }
-    }
 
 }
