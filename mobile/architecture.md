@@ -71,11 +71,15 @@ Every feature in the presentation layer must strictly follow this package layout
 
 ---
 
-### 4. Solid Unit Testing Strategy 🧪
-- Thorough unit test coverage across all layers:
-  - **`:domain` unit tests**: Testing role-based domain components (`RecipeCreator`, `RecipeProvider`, `RecipeDeleter`).
-  - **`:shared` unit tests**: Testing ViewModels and presentation interactors (using **Turbine** for `StateFlow`).
-  - **`:data:repository` & `:data:network` unit tests**: Testing repositories, data mappers, and API clients.
+### 4. Solid Unit Testing Strategy & Kotlin Backtick Naming 🧪
+- Thorough unit test coverage across all layers.
+- **Test Function Naming Convention**:
+  - Use Kotlin's backtick syntax to write natural English sentences describing test actions:
+    ```kotlin
+    @Test
+    fun `load recipe detail and update state`() = runTest { ... }
+    ```
+  - `snake_case` (e.g. `test_function_name`) is strictly forbidden.
 
 ---
 

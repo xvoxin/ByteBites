@@ -77,3 +77,4 @@ To ensure maximum cross-platform code reuse and zero infrastructure cost during 
 - **`:domain`**: 100% Unit test coverage on Role-based Domain Components (`RecipeCreator`, `RecipeProvider`, `RecipeDeleter`).
 - **`:presentation`**: Unit tests for ViewModels and Interactors verifying MVI State reductions using `Turbine`.
 - **`:data:repository` & `:data:network`**: Unit tests for repositories, network clients, and data mappers.
+- **Test Naming Convention**: Use Kotlin's backtick syntax with clear English sentences (e.g. `@Test fun `load recipe detail and update state`()`). `snake_case` is strictly forbidden.

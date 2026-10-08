@@ -49,7 +49,7 @@ class RecipeProviderTest {
     private val provider = RecipeProvider(repository)
 
     @Test
-    fun getFavoriteRecipes_filters_only_favorite_recipes() = runTest {
+    fun `filter only favorite recipes`() = runTest {
         provider.getFavoriteRecipes().test {
             val favorites = awaitItem()
             assertEquals(1, favorites.size)
@@ -60,7 +60,7 @@ class RecipeProviderTest {
     }
 
     @Test
-    fun getRecipesByCategory_filters_recipes_by_category_id() = runTest {
+    fun `filter recipes by category id`() = runTest {
         provider.getRecipesByCategory("desserts").test {
             val desserts = awaitItem()
             assertEquals(1, desserts.size)
@@ -68,4 +68,5 @@ class RecipeProviderTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
 }

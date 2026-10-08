@@ -13,7 +13,7 @@ class InMemoryRecipeRepositoryTest {
     private val repository = InMemoryRecipeRepository()
 
     @Test
-    fun getRecipes_emits_initial_recipes() = runTest {
+    fun `emit initial recipes`() = runTest {
         repository.getRecipes().test {
             val recipes = awaitItem()
             assertTrue(recipes.isNotEmpty(), "Initial recipes list should not be empty")
@@ -23,7 +23,7 @@ class InMemoryRecipeRepositoryTest {
     }
 
     @Test
-    fun toggleFavorite_updates_recipe_favorite_status() = runTest {
+    fun `update recipe favorite status`() = runTest {
         repository.getRecipes().test {
             val initialList = awaitItem()
             val targetRecipe = initialList.first { !it.isFavorite }
@@ -38,7 +38,7 @@ class InMemoryRecipeRepositoryTest {
     }
 
     @Test
-    fun addRecipe_prepends_new_recipe_to_list() = runTest {
+    fun `prepend new recipe to list`() = runTest {
         val newRecipe = Recipe(
             id = "new_test_1",
             title = "Test Pizza",
@@ -68,7 +68,7 @@ class InMemoryRecipeRepositoryTest {
     }
 
     @Test
-    fun deleteRecipe_removes_recipe_from_list() = runTest {
+    fun `remove recipe from list`() = runTest {
         repository.getRecipes().test {
             val initial = awaitItem()
             val targetId = initial.first().id
@@ -81,4 +81,5 @@ class InMemoryRecipeRepositoryTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
 }

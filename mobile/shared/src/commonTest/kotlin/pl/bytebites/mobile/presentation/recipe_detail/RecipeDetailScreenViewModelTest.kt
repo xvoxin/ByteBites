@@ -61,7 +61,7 @@ class RecipeDetailScreenViewModelTest {
     }
 
     @Test
-    fun loadRecipeDetail_loads_and_updates_state() = runTest {
+    fun `load recipe detail and update state`() = runTest {
         viewModel.state.test {
             viewModel.onIntent(RecipeDetailIntent.LoadRecipeDetail("recipe_100"))
             testDispatcher.scheduler.advanceUntilIdle()
@@ -74,7 +74,7 @@ class RecipeDetailScreenViewModelTest {
     }
 
     @Test
-    fun backClicked_intent_emits_NavigateBack_effect() = runTest {
+    fun `emit navigate back effect on back click`() = runTest {
         viewModel.effect.test {
             viewModel.onIntent(RecipeDetailIntent.BackClicked)
             testDispatcher.scheduler.advanceUntilIdle()
@@ -83,4 +83,5 @@ class RecipeDetailScreenViewModelTest {
             assertEquals(RecipeDetailEffect.NavigateBack, effect)
         }
     }
+
 }

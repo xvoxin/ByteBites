@@ -14,7 +14,7 @@ class RecipeCreatorTest {
     private val creator = RecipeCreator(repository)
 
     @Test
-    fun createRecipe_fails_when_title_is_blank() = runTest {
+    fun `fail when title is blank`() = runTest {
         val recipe = Recipe(
             id = "1",
             title = "   ",
@@ -36,7 +36,7 @@ class RecipeCreatorTest {
     }
 
     @Test
-    fun createRecipe_fails_when_ingredients_are_empty() = runTest {
+    fun `fail when ingredients list is empty`() = runTest {
         val recipe = Recipe(
             id = "1",
             title = "Pyszna Zupa",
@@ -58,7 +58,7 @@ class RecipeCreatorTest {
     }
 
     @Test
-    fun createRecipe_succeeds_and_adds_recipe_to_repository() = runTest {
+    fun `succeed and add recipe to repository`() = runTest {
         val recipe = Recipe(
             id = "1",
             title = "Pyszna Zupa",
@@ -85,4 +85,5 @@ class RecipeCreatorTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
 }

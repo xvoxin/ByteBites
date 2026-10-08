@@ -20,7 +20,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultFeedViewModelTest {
+class FeedScreenViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
 
@@ -61,7 +61,7 @@ class DefaultFeedViewModelTest {
     }
 
     @Test
-    fun viewModel_loads_recipes_and_updates_state() = runTest {
+    fun `load recipes and update state`() = runTest {
         viewModel.state.test {
             testDispatcher.scheduler.advanceUntilIdle()
 
@@ -73,7 +73,7 @@ class DefaultFeedViewModelTest {
     }
 
     @Test
-    fun recipeClicked_intent_emits_NavigateToDetail_effect() = runTest {
+    fun `emit navigate to detail effect on recipe click`() = runTest {
         viewModel.effect.test {
             viewModel.onIntent(FeedIntent.RecipeClicked("1"))
             testDispatcher.scheduler.advanceUntilIdle()
