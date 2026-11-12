@@ -1,12 +1,13 @@
-# ByteBites Mobile Architecture & Specifications
+# ByteBites Frontend Architecture & Specifications
 
-This document defines the mobile architecture, technology choices, engineering standards, and AI integration strategy for the **ByteBites (KMP)** application.
+This document defines the multiplatform frontend architecture, technology choices, engineering standards, and AI integration strategy for the **ByteBites (KMP)** client application targeting **Android, iOS, and Web (Wasm/JS)**.
 
 ---
 
 ## 🛠️ Tech Stack & Core Standards
 
-- **Framework**: Kotlin Multiplatform (KMP) with Compose Multiplatform for Android & iOS.
+- **Framework**: Kotlin Multiplatform (KMP) with Compose Multiplatform.
+- **Target Platforms**: Android, iOS, and Web (Wasm/JS).
 - **Dependency Injection**: Koin.
 - **Presentation Pattern**: Model-View-Intent (MVI) with Abstract ViewModels and Presentation Interactors.
 - **Testing Tools**: `kotlin.test`, `kotlinx-coroutines-test`, `Turbine` (for `StateFlow` testing).
@@ -35,26 +36,27 @@ ByteBites strictly enforces **Clean Architecture** using a dedicated nested Mult
    - **Expression Body Functions**: Single-expression functions returning immediately must use the expression body (`=`) syntax.
    - **Single `state` property in ViewModels**: Concrete ViewModels override `val state = MutableStateFlow(...)` directly without duplicating `_state` and `state`.
    - **UI Constants**: All `.dp` and `.sp` dimensions are declared as top-level private constants using extension properties (e.g., `private val HEADER_ELEVATION = 6.dp`). No raw dimensions inside `@Composable` functions!
-5. **`:androidApp` / `:iosApp`**:
+5. **`:androidApp` / `:iosApp` / `:webApp`**:
    - Platform entry points.
 
 ---
 
 ## 🗺️ Incremental MVP Roadmap (Step-by-Step UI/UX)
 
-- **Step 2**: **Minimal Feed Screen**
+- **Step 2 (Completed)**: **Minimal Feed Screen**
   - Display public list of recipes (`FeedScreen`).
-- **Step 3 (Current Focus)**: **Recipe Detail Screen**
-  - `RecipeDetailScreen` displaying ingredients checklist and step-by-step preparation instructions.
-  - Interactive ingredient checkboxes and step numbers.
-- **Step 4**: **Search Bar & Category Chapters**
+- **Step 3 (Completed)**: **Recipe Detail Screen**
+  - Detailed recipe view showing ingredients checklist and step-by-step instructions.
+- **Step 4 (Current Focus)**: **User Account & Authentication (`feature/auth`)**
+  - User login/registration flow and User Profile screen displaying logged-in author profile.
+- **Step 5**: **Recipe Management & CRUD (`feature/add_recipe` & deletion)**
+  - Form modal to create new recipes and option to delete own recipes (verifying author ownership).
+- **Step 6**: **Search Bar & Category Chapters**
   - Header search input and horizontal category filter chips.
-- **Step 5**: **Favorites System**
+- **Step 7**: **Favorites System**
   - Heart toggle action on cards and dedicated "Favorites" tab/filter.
-- **Step 6**: **Recipe Management (Add & Delete)**
-  - Form modal to submit new recipes and author delete option.
-- **Step 7**: **Spring Boot Backend & Cloud Integration**
-  - Ktor network implementation connecting mobile client to backend REST services.
+- **Step 8**: **Spring Boot Backend & Cloud Integration**
+  - Ktor network implementation connecting client to backend REST services.
 
 ---
 
@@ -63,7 +65,7 @@ ByteBites strictly enforces **Clean Architecture** using a dedicated nested Mult
 To ensure maximum cross-platform code reuse and zero infrastructure cost during development:
 
 - **Architecture**: **Cloud API Approach** (Option B) via Ktor / HTTP requests to Google AI Studio.
-- **Cross-Platform Compatibility**: 100% shared Kotlin code across Android and iOS without writing platform-native plugins.
+- **Cross-Platform Compatibility**: 100% shared Kotlin code across Android, iOS, and Web without writing platform-native plugins.
 - **Nutritional Macro Calculation**:
   - Uses **Gemini Flash** (Gemini 1.5/2.0 Flash) in Structured Output (JSON) mode.
   - Cost: **100% Free** under Google AI Studio Free Tier (up to 15 Requests Per Minute / 1500 Requests Per Day).

@@ -1,6 +1,6 @@
-# ByteBites Mobile Architecture Guidelines
+# ByteBites Frontend Architecture Guidelines
 
-This document defines the architectural principles, design patterns, and engineering standards for the **ByteBites (KMP)** mobile client.
+This document defines the architectural principles, design patterns, and engineering standards for the **ByteBites (KMP)** frontend client targeting **Android, iOS, and Web (Wasm/JS)**.
 
 ---
 
@@ -8,11 +8,11 @@ This document defines the architectural principles, design patterns, and enginee
 
 ### 1. Clean Architecture & Nested Gradle Multi-Modularity
 The application is strictly partitioned into Clean Architecture layers using nested Gradle modules (without redundant `:core` nesting):
-- **`:domain`**: Pure Kotlin Multiplatform code containing business logic, domain models, repository interfaces, and role-based domain components (`Provider`, `Creator`, `Deleter`, `Authenticator`). Zero dependencies on Android, iOS, Ktor, or Compose.
+- **`:domain`**: Pure Kotlin Multiplatform code containing business logic, domain models, repository interfaces, and role-based domain components (`Provider`, `Creator`, `Deleter`, `Authenticator`). Zero dependencies on Android, iOS, Web, Ktor, or Compose.
 - **`:data:network`**: API communication, Ktor HTTP client, DTOs, JSON serialization, and network error handling.
 - **`:data:repository`**: Data integration layer depending on `:domain` and `:data:network` (and future `:data:database`). Implements repository interfaces defined in `:domain` (e.g., `InMemoryRecipeRepository`, `KtorRecipeRepository`) and maps DTOs to domain models.
 - **`:shared` (Presentation Layer)**: UI (Compose Multiplatform), ViewModels (MVI), presentation interactors, and view components. Depends on `:domain` and `:data:repository`.
-- **`:androidApp` / `:iosApp`**: Platform entry points.
+- **`:androidApp` / `:iosApp` / `:webApp`**: Platform entry points for Android, iOS, and Web.
 
 ---
 
