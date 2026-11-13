@@ -11,6 +11,7 @@ This document defines the multiplatform frontend architecture, technology choice
 - **Dependency Injection**: Koin.
 - **Presentation Pattern**: Model-View-Intent (MVI) with Abstract ViewModels and Presentation Interactors.
 - **Testing Tools**: `kotlin.test`, `kotlinx-coroutines-test`, `Turbine` (for `StateFlow` testing).
+- **Icon Strategy**: **Always search for official Google Material Design icons first** (via Vector Asset Studio or Material Symbols) before creating custom vector/graphic assets. Vector assets must be placed in `shared/src/commonMain/composeResources/drawable/*.xml` to guarantee native cross-platform support across Android, iOS, and Web.
 
 ---
 

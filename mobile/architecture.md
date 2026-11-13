@@ -48,7 +48,11 @@ Every feature in the presentation layer must strictly follow this package layout
   private val EMBLEM_EMOJI_SIZE = 28.sp
   ```
 
-#### E) Code Formatting & Function Syntax Rules
+#### E) Vector Icons & Asset Strategy 🎨
+- **Always search for official Material Design icons first** (via Android Studio's Vector Asset Studio or Google Material Symbols) before creating custom vector or graphic assets.
+- Save vector assets as Android Vector XML (`.xml`) files inside `shared/src/commonMain/composeResources/drawable/` to ensure native 100% compatibility across Android, iOS, and Web without runtime SVG errors.
+
+#### F) Code Formatting & Function Syntax Rules
 - **No empty lines inside constructor parentheses `(...)` in classes or data classes.**
 - **Single-expression functions returning immediately must use the expression body (`=`) syntax:**
   ```kotlin
