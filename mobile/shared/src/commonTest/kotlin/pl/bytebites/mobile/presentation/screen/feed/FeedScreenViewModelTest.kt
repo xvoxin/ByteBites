@@ -82,4 +82,15 @@ class FeedScreenViewModelTest {
         }
     }
 
+    @Test
+    fun `emit navigate to profile effect on profile icon click`() = runTest {
+        viewModel.effect.test {
+            viewModel.onIntent(FeedIntent.ProfileClicked)
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            val effect = awaitItem()
+            assertEquals(FeedEffect.NavigateToProfile, effect)
+        }
+    }
+
 }

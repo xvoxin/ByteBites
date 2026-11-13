@@ -8,14 +8,16 @@ data class FeedState(
 
 sealed interface FeedIntent {
 
-    data object LoadRecipes : FeedIntent
-
     data class RecipeClicked(val recipeId: String) : FeedIntent
+
+    data object ProfileClicked : FeedIntent
 
 }
 
 sealed interface FeedEffect {
 
     data class NavigateToDetail(val recipeId: String) : FeedEffect
+
+    data object NavigateToProfile : FeedEffect
 
 }

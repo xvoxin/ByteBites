@@ -32,6 +32,7 @@ import pl.bytebites.mobile.presentation.theme.Dimen
 fun FeedScreen(
     viewModel: FeedViewModel,
     onNavigateToDetail: (String) -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsState()
@@ -40,6 +41,7 @@ fun FeedScreen(
         viewModel.effect.collectLatest { effect ->
             when (effect) {
                 is FeedEffect.NavigateToDetail -> onNavigateToDetail(effect.recipeId)
+                is FeedEffect.NavigateToProfile -> onNavigateToProfile()
             }
         }
     }
@@ -66,7 +68,10 @@ fun FeedContent(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            FeedHeader(totalRecipesCount = state.recipes.size)
+            FeedHeader(
+                totalRecipesCount = state.recipes.size,
+                onProfileClick = { onIntent(FeedIntent.ProfileClicked) }
+            )
 
             when {
                 state.isLoading -> {

@@ -27,10 +27,15 @@ class FeedScreenViewModel(
 
     override fun onIntent(intent: FeedIntent) {
         when (intent) {
-            is FeedIntent.LoadRecipes -> loadRecipes()
             is FeedIntent.RecipeClicked -> {
                 viewModelScope.launch {
                     effectChannel.send(FeedEffect.NavigateToDetail(intent.recipeId))
+                }
+            }
+
+            is FeedIntent.ProfileClicked -> {
+                viewModelScope.launch {
+                    effectChannel.send(FeedEffect.NavigateToProfile)
                 }
             }
         }
@@ -38,11 +43,10 @@ class FeedScreenViewModel(
 
     private fun loadRecipes() {
         viewModelScope.launch {
-            state.update { it.copy(isLoading = true, error = null) }
-            feedProvider.getRecipes().collect { recipeList ->
+            feedProvider.getRecipes().collect { recipes ->
                 state.update {
                     it.copy(
-                        recipes = recipeList,
+                        recipes = recipes,
                         isLoading = false,
                         error = null
                     )

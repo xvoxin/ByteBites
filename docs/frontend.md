@@ -28,7 +28,7 @@ ByteBites strictly enforces **Clean Architecture** using a dedicated nested Mult
    - Coordinates data sources (injects `:data:network` services and local storage) and maps DTOs to Domain Models.
    - **Naming Convention**: Class names reflect the underlying technology/strategy instead of generic `Impl` suffixes (e.g., `InMemoryRecipeRepository`, `KtorRecipeRepository`, `RoomRecipeRepository`).
 4. **`:shared` (Presentation Layer)**:
-   - Feature package structure:
+   - Screen Package Structure (`presentation/screen/<feature_name>/`):
      - **`view`**: Compose views (`FeedScreen`, `RecipeDetailScreen`, etc.). No `ui` package!
      - **`viewmodel`**: Abstract and concrete ViewModels in separate files (`RecipeDetailViewModel.kt`, `RecipeDetailScreenViewModel.kt`, `FakeRecipeDetailViewModel.kt`).
      - **`model`**: MVI States, Intents, Effects, UI Models, Mappers (`RecipeDetailState`, `RecipeDetailIntent`, `RecipeDetailEffect`, `RecipeDetail`, `RecipeDetailMapper`).
