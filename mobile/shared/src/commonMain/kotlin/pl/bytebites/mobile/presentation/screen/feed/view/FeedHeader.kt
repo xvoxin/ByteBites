@@ -3,7 +3,6 @@ package pl.bytebites.mobile.presentation.screen.feed.view
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,15 +20,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import bytebites.shared.generated.resources.Res
-import bytebites.shared.generated.resources.group
+import bytebites.shared.generated.resources.person
 import org.jetbrains.compose.resources.painterResource
+import pl.bytebites.mobile.presentation.theme.CookbookTheme
 import pl.bytebites.mobile.presentation.theme.Dimen
 
-private const val HEADER_CARD_ALPHA = 0.5f
 private val EMBLEM_SIZE = 56.dp
 
 @Composable
@@ -41,10 +42,10 @@ fun FeedHeader(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = Dimen.Margin_2, vertical = Dimen.Margin_1),
+            .padding(Dimen.Margin_2),
         shape = RoundedCornerShape(Dimen.RadiusXLarge),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = HEADER_CARD_ALPHA)
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = Dimen.ElevationMedium)
     ) {
@@ -58,7 +59,7 @@ fun FeedHeader(
                 modifier = Modifier.align(Alignment.TopEnd)
             ) {
                 Icon(
-                    painter = painterResource(Res.drawable.group),
+                    painter = painterResource(Res.drawable.person),
                     contentDescription = "Mój Profil",
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(Dimen.IconSizeMedium)
@@ -110,6 +111,18 @@ fun FeedHeader(
                     textAlign = TextAlign.Center
                 )
             }
+        }
+    }
+}
+
+@Composable
+@Preview
+fun FeedHeaderPreview() {
+    CookbookTheme {
+        Box(Modifier.background(Color.White)) {
+            FeedHeader(
+                totalRecipesCount = 42
+            )
         }
     }
 }

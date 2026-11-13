@@ -5,6 +5,8 @@ import androidx.compose.ui.Modifier
 import org.koin.compose.koinInject
 import pl.bytebites.mobile.presentation.screen.feed.view.FeedScreen
 import pl.bytebites.mobile.presentation.screen.feed.viewmodel.FeedViewModel
+import pl.bytebites.mobile.presentation.screen.profile.view.ProfileScreen
+import pl.bytebites.mobile.presentation.screen.profile.viewmodel.ProfileViewModel
 import pl.bytebites.mobile.presentation.screen.recipe_detail.view.RecipeDetailScreen
 import pl.bytebites.mobile.presentation.screen.recipe_detail.viewmodel.RecipeDetailViewModel
 
@@ -30,6 +32,9 @@ fun AppNavigation(
                     viewModel = viewModel,
                     onNavigateToDetail = { recipeId ->
                         navigator.navigateTo(NavKey.RecipeDetail(recipeId))
+                    },
+                    onNavigateToProfile = {
+                        navigator.navigateTo(NavKey.Profile)
                     }
                 )
             }
@@ -41,6 +46,19 @@ fun AppNavigation(
                     viewModel = viewModel,
                     onNavigateBack = {
                         navigator.navigateBack()
+                    }
+                )
+            }
+
+            is NavKey.Profile -> {
+                val viewModel: ProfileViewModel = koinInject()
+                ProfileScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = {
+                        navigator.navigateBack()
+                    },
+                    onNavigateToAuth = {
+                        // Reserved for Step 4 Auth screen navigation
                     }
                 )
             }

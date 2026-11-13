@@ -6,4 +6,6 @@ sealed interface NavKey {
 
     data class RecipeDetail(val recipeId: String) : NavKey
 
+    data object Profile : NavKey
+
 }
