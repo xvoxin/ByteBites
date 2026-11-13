@@ -5,17 +5,20 @@ Architectural Stack: Clean Architecture, MVI Presentation, Navigation 3, Koin DI
 
 ---
 
-## ⛔ MANDATORY OPERATIONAL GUARDRAILS (STRICT COMPLIANCE REQUIRED)
+## ⛔ MANDATORY OPERATIONAL WORKFLOW
 
-### 1. EXPLICIT USER APPROVAL BEFORE ANY FILE MODIFICATION
-- **NEVER write, edit, or delete any file without first presenting the proposed change to the user and receiving explicit approval ("tak").**
-- Do NOT perform multiple file edits or multi-file code generation in a single turn without stopping for user approval between steps.
+### 1. STEP-LEVEL PLAN APPROVAL
+- **Before starting any new feature or refactoring step, present the full step plan first**:
+  - List of TDD behaviors / test cases to drive in the test file.
+  - List of files that will be created or modified during the step.
+- Wait for user approval on the plan ("Działamy z...").
+- Do NOT ask for approval on every individual file creation within an approved step.
 
 ### 2. STRICT TEST-DRIVEN DEVELOPMENT (TDD) WORKFLOW
-- **ALWAYS write the test file FIRST (RED 🔴)** before touching any production code.
+- **ALWAYS write the test file FIRST (RED 🔴)** before writing production code.
 - Run the test using Gradle to confirm that it fails on assertion (compile errors do NOT count as RED).
-- Present **Checkpoint RED** to the user and wait for feedback/approval.
-- Only after user approval, write the minimal production code required to make the test pass (**GREEN 🟢**).
+- Present **Checkpoint RED** to the user.
+- Write the minimal production code required to make the test pass (**GREEN 🟢**).
 - Run tests again, present **Checkpoint GREEN**, and proceed to **REFACTOR 🔵** if needed.
 
 ### 3. PACKAGE & CODE CONVENTIONS
