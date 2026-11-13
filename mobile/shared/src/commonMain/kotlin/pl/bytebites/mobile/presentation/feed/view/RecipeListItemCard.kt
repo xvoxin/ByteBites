@@ -23,11 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import pl.bytebites.mobile.presentation.feed.model.Recipe
 import pl.bytebites.mobile.presentation.theme.Dimen
 import pl.bytebites.mobile.presentation.theme.RestaurantIcon
+import pl.bytebites.mobile.presentation.theme.StarIcon
+import pl.bytebites.mobile.presentation.theme.TimerIcon
 
 private const val BORDER_ALPHA = 0.5f
 private const val EMOJI_CONTAINER_ALPHA = 0.6f
@@ -94,9 +97,9 @@ fun RecipeListItemCard(
                     horizontalArrangement = Arrangement.spacedBy(Dimen.Margin_1_25),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    MetaItem(icon = "⏱️", text = recipe.prepTime)
-                    MetaItem(icon = "🍳", text = recipe.difficulty)
-                    MetaItem(icon = "⭐", text = recipe.rating)
+                    MetaItem(icon = TimerIcon, text = recipe.prepTime)
+                    MetaItem(icon = RestaurantIcon, text = recipe.difficulty)
+                    MetaItem(icon = StarIcon, text = recipe.rating)
                 }
             }
         }
@@ -104,9 +107,14 @@ fun RecipeListItemCard(
 }
 
 @Composable
-private fun MetaItem(icon: String, text: String) {
+private fun MetaItem(icon: ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = icon, fontSize = Dimen.TextSize_05)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(Dimen.IconSizeSmall)
+        )
         Spacer(modifier = Modifier.width(Dimen.Margin_025))
         Text(
             text = text,
