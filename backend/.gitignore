@@ -1,0 +1,27 @@
+# IDE & OS
+.idea/
+*.iml
+.DS_Store
+*.swp
+*~
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Build & Gradle
+build/
+.gradle/
+out/
+target/
+*.log
+
+# Docker & Persistence
+postgres_data/
+
+# Android Studio IDE
+local.properties
