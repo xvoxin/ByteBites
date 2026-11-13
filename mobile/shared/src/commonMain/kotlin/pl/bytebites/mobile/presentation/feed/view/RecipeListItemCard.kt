@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import pl.bytebites.mobile.presentation.feed.model.Recipe
 import pl.bytebites.mobile.presentation.theme.Dimen
+import pl.bytebites.mobile.presentation.theme.RestaurantIcon
 
 private const val BORDER_ALPHA = 0.5f
 private const val EMOJI_CONTAINER_ALPHA = 0.6f
@@ -59,7 +61,12 @@ fun RecipeListItemCard(
                     .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = EMOJI_CONTAINER_ALPHA)),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = recipe.emoji, fontSize = Dimen.TextSize_4_5)
+                Icon(
+                    imageVector = RestaurantIcon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(Dimen.IconSizeMedium)
+                )
             }
 
             Spacer(modifier = Modifier.width(Dimen.Margin_1_75))

@@ -156,7 +156,6 @@ fun RecipeDetailContentSuccessPreview() {
         description = "Aromatyczna, rozgrzewająca zupa krem z pieczonej dyni z dodatkiem świeżego imbiru.",
         ingredients = listOf("1 kg dyni hokkaido", "400 ml mleczka kokosowego", "1 duża cebula"),
         steps = listOf("Upiecz dynię w 200C przez 25 minut.", "Zblenduj z mleczkiem kokosowym."),
-        emoji = "🎃",
         authorName = "Ania Kowalska"
     )
 

@@ -8,6 +8,5 @@ fun DomainRecipe.toPresentation(): Recipe = Recipe(
     categoryName = categoryName,
     prepTime = prepTime,
     difficulty = difficulty,
-    rating = rating.toString(),
-    emoji = emoji
+    rating = rating.toString()
 )

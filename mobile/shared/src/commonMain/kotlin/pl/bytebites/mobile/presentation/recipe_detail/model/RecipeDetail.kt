@@ -11,6 +11,5 @@ data class RecipeDetail(
     val description: String,
     val ingredients: List<String>,
     val steps: List<String>,
-    val emoji: String,
     val authorName: String
 )

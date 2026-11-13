@@ -50,8 +50,7 @@ class InMemoryRecipeRepositoryTest {
             servings = 2,
             description = "Smaczna pizza testowa",
             ingredients = listOf("Ciasto", "Sos pomidorowy", "Ser"),
-            steps = listOf("Upiecz w 250C"),
-            emoji = "🍕"
+            steps = listOf("Upiecz w 250C")
         )
 
         repository.getRecipes().test {

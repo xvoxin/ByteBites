@@ -140,8 +140,7 @@ fun FeedContentSuccessPreview() {
             categoryName = "Obiady",
             prepTime = "30 min",
             difficulty = "Łatwe",
-            rating = "4.9",
-            emoji = "🎃"
+            rating = "4.9"
         ),
         Recipe(
             id = "2",
@@ -149,8 +148,7 @@ fun FeedContentSuccessPreview() {
             categoryName = "Desery",
             prepTime = "45 min",
             difficulty = "Średnie",
-            rating = "5.0",
-            emoji = "🍰"
+            rating = "5.0"
         )
     )
 

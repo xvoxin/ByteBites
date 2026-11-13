@@ -37,8 +37,7 @@ class RecipeDetailScreenViewModelTest {
         servings = 4,
         description = "Opis zupy",
         ingredients = listOf("Dynia"),
-        steps = listOf("Ugotuj"),
-        emoji = "🎃"
+        steps = listOf("Ugotuj")
     )
 
     private lateinit var repository: FakeRecipeRepository

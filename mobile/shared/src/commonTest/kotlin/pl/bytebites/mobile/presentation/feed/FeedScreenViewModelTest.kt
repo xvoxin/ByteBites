@@ -36,8 +36,7 @@ class FeedScreenViewModelTest {
             servings = 2,
             description = "Test",
             ingredients = listOf("a"),
-            steps = listOf("b"),
-            emoji = "🍲"
+            steps = listOf("b")
         )
     )
 

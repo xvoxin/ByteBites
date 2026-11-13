@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import pl.bytebites.mobile.presentation.recipe_detail.model.RecipeDetail
 import pl.bytebites.mobile.presentation.theme.ArrowBackIcon
 import pl.bytebites.mobile.presentation.theme.Dimen
+import pl.bytebites.mobile.presentation.theme.RestaurantIcon
 
 private const val HEADER_CONTAINER_ALPHA = 0.4f
 private val EMBLEM_CONTAINER_SIZE = 52.dp
@@ -90,7 +91,12 @@ fun RecipeDetailHeader(
                         .background(MaterialTheme.colorScheme.surface),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = detail.emoji, fontSize = Dimen.TextSize_4_5)
+                    Icon(
+                        imageVector = RestaurantIcon,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(Dimen.IconSizeMedium)
+                    )
                 }
 
                 Spacer(modifier = Modifier.width(Dimen.Margin_1_5))

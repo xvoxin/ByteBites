@@ -13,6 +13,5 @@ fun DomainRecipe.toDetailPresentation(): RecipeDetail = RecipeDetail(
     description = description,
     ingredients = ingredients,
     steps = steps,
-    emoji = emoji,
     authorName = authorName
 )

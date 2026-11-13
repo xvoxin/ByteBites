@@ -12,7 +12,6 @@ data class Recipe(
     val description: String,
     val ingredients: List<String>,
     val steps: List<String>,
-    val emoji: String,
     val authorId: String = "system",
     val authorName: String = "ByteBites Chef",
     val isFavorite: Boolean = false,

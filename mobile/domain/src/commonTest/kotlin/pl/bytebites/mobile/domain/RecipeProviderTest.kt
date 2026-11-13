@@ -23,7 +23,6 @@ class RecipeProviderTest {
             description = "",
             ingredients = listOf("a"),
             steps = listOf("b"),
-            emoji = "🍲",
             isFavorite = true,
             isFeatured = true
         ),
@@ -39,7 +38,6 @@ class RecipeProviderTest {
             description = "",
             ingredients = listOf("x"),
             steps = listOf("y"),
-            emoji = "🍰",
             isFavorite = false,
             isFeatured = false
         )

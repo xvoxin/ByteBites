@@ -26,8 +26,7 @@ class RecipeCreatorTest {
             servings = 2,
             description = "Opis",
             ingredients = listOf("Składnik"),
-            steps = listOf("Krok"),
-            emoji = "🍲"
+            steps = listOf("Krok")
         )
 
         val result = creator.createRecipe(recipe)
@@ -48,8 +47,7 @@ class RecipeCreatorTest {
             servings = 2,
             description = "Opis",
             ingredients = emptyList(),
-            steps = listOf("Krok"),
-            emoji = "🍲"
+            steps = listOf("Krok")
         )
 
         val result = creator.createRecipe(recipe)
@@ -70,8 +68,7 @@ class RecipeCreatorTest {
             servings = 2,
             description = "Opis",
             ingredients = listOf("Marchewka"),
-            steps = listOf("Gotuj"),
-            emoji = "🍲"
+            steps = listOf("Gotuj")
         )
 
         val result = creator.createRecipe(recipe)

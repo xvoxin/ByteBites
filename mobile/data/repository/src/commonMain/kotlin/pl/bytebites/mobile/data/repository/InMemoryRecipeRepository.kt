@@ -68,7 +68,6 @@ class InMemoryRecipeRepository : RecipeRepository {
                     "Zblenduj całość na gładki krem z mleczkiem kokosowym.",
                     "Podawaj na gorąco z prażonymi pestkami."
                 ),
-                emoji = "🎃",
                 isFavorite = true,
                 isFeatured = true
             ),
@@ -98,7 +97,6 @@ class InMemoryRecipeRepository : RecipeRepository {
                     "Przykryj patelnię i gotuj na wolnym ogniu około 5 minut, aż białka ściągną się.",
                     "Posyp pokruszoną fetą i kolendrą."
                 ),
-                emoji = "🍳",
                 isFavorite = true,
                 isFeatured = false
             ),
@@ -127,7 +125,6 @@ class InMemoryRecipeRepository : RecipeRepository {
                     "Wyłóż krem na ostudzony spód tarty.",
                     "Ułóż gęsto maliny i udekoruj listkami mięty."
                 ),
-                emoji = "🍰",
                 isFavorite = false,
                 isFeatured = false
             )
