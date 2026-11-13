@@ -3,10 +3,10 @@ package pl.bytebites.mobile.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.koin.compose.koinInject
-import pl.bytebites.mobile.presentation.feed.view.FeedScreen
-import pl.bytebites.mobile.presentation.feed.viewmodel.FeedViewModel
-import pl.bytebites.mobile.presentation.recipe_detail.view.RecipeDetailScreen
-import pl.bytebites.mobile.presentation.recipe_detail.viewmodel.RecipeDetailViewModel
+import pl.bytebites.mobile.presentation.screen.feed.view.FeedScreen
+import pl.bytebites.mobile.presentation.screen.feed.viewmodel.FeedViewModel
+import pl.bytebites.mobile.presentation.screen.recipe_detail.view.RecipeDetailScreen
+import pl.bytebites.mobile.presentation.screen.recipe_detail.viewmodel.RecipeDetailViewModel
 
 @Composable
 fun AppNavigation(

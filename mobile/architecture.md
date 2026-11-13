@@ -18,8 +18,8 @@ The application is strictly partitioned into Clean Architecture layers using nes
 
 ### 2. Presentation Layer Standards: Package Structure, Interactors, and Formatting
 
-#### A) Feature Package Structure (`presentation/feature/`)
-Every feature in the presentation layer must strictly follow this package layout:
+#### A) Screen Package Structure (`presentation/screen/<feature_name>/`)
+Every screen feature in the presentation layer must strictly reside inside `presentation/screen/<feature_name>/` and follow this package layout:
 - **`view`**: Compose views (`FeedScreen`, `FeedHeader`, `RecipeListItemCard`). The package name `ui` is strictly forbidden!
 - **`viewmodel`**: ViewModels. Each ViewModel class must reside in its own separate file!
   - Abstract ViewModel: `RecipeDetailViewModel.kt`
