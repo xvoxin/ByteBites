@@ -1,5 +1,6 @@
 package pl.bytebites.mobile.presentation.recipe_detail.view
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,10 +26,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import bytebites.shared.generated.resources.Res
+import bytebites.shared.generated.resources.arrow_back
+import bytebites.shared.generated.resources.restaurant
+import org.jetbrains.compose.resources.painterResource
 import pl.bytebites.mobile.presentation.recipe_detail.model.RecipeDetail
-import pl.bytebites.mobile.presentation.theme.ArrowBackIcon
 import pl.bytebites.mobile.presentation.theme.Dimen
-import pl.bytebites.mobile.presentation.theme.RestaurantIcon
 
 private const val HEADER_CONTAINER_ALPHA = 0.4f
 private val EMBLEM_CONTAINER_SIZE = 52.dp
@@ -52,7 +55,7 @@ fun RecipeDetailHeader(
         ) {
             IconButton(onClick = onBackClick) {
                 Icon(
-                    imageVector = ArrowBackIcon,
+                    painter = painterResource(Res.drawable.arrow_back),
                     contentDescription = "Wróć",
                     tint = MaterialTheme.colorScheme.onBackground
                 )
@@ -92,7 +95,7 @@ fun RecipeDetailHeader(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = RestaurantIcon,
+                        painter = painterResource(Res.drawable.restaurant),
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(Dimen.IconSizeMedium)
