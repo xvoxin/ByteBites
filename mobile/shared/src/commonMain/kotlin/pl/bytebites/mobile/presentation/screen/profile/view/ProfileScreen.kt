@@ -37,6 +37,7 @@ import bytebites.shared.generated.resources.arrow_back
 import bytebites.shared.generated.resources.person
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.painterResource
+import pl.bytebites.mobile.presentation.navigation.BackTopBar
 import pl.bytebites.mobile.presentation.screen.profile.model.ProfileEffect
 import pl.bytebites.mobile.presentation.screen.profile.model.ProfileIntent
 import pl.bytebites.mobile.presentation.screen.profile.model.ProfileState
@@ -88,7 +89,7 @@ fun ProfileContent(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            ProfileTopBar(onBackClick = onBackClick)
+            BackTopBar(title = "Mój Profil", onBackClick = onBackClick)
 
             when {
                 state.isLoading -> LoadingProfileState()
@@ -101,32 +102,6 @@ fun ProfileContent(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun ProfileTopBar(onBackClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = Dimen.Margin_1, vertical = Dimen.Margin_05),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(onClick = onBackClick) {
-            Icon(
-                painter = painterResource(Res.drawable.arrow_back),
-                contentDescription = "Wróć",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
-        }
-
-        Text(
-            text = "Mój Profil",
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        )
     }
 }
 

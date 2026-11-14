@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.collectLatest
+import pl.bytebites.mobile.presentation.navigation.BackTopBar
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetail
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailEffect
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailIntent
@@ -74,6 +75,11 @@ fun RecipeDetailContent(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            BackTopBar(
+                title = "Szczegóły Przepisu",
+                onBackClick = { onIntent(RecipeDetailIntent.BackClicked) }
+            )
+
             when {
                 state.isLoading -> {
                     Box(
@@ -104,10 +110,7 @@ fun RecipeDetailContent(
                 state.recipeDetail != null -> {
                     val detail = state.recipeDetail
 
-                    RecipeDetailHeader(
-                        detail = detail,
-                        onBackClick = { onIntent(RecipeDetailIntent.BackClicked) }
-                    )
+                    RecipeDetailHeader(detail = detail)
 
                     Column(
                         modifier = Modifier
@@ -153,15 +156,15 @@ fun RecipeDetailContentSuccessPreview() {
         difficulty = "Łatwe",
         rating = "4.9",
         servings = "4 porcje",
-        description = "Aromatyczna, rozgrzewająca zupa krem z pieczonej dyni z dodatkiem świeżego imbiru.",
-        ingredients = listOf("1 kg dyni hokkaido", "400 ml mleczka kokosowego", "1 duża cebula"),
-        steps = listOf("Upiecz dynię w 200C przez 25 minut.", "Zblenduj z mleczkiem kokosowym."),
-        authorName = "Ania Kowalska"
+        description = "Aromatyczna, rozgrzewająca zupa krem z pieczonej dyni.",
+        ingredients = listOf("Dynia hokkaido", "Mleczko kokosowe", "Imbir"),
+        steps = listOf("Upiecz dynię", "Zblenduj z mleczkiem", "Podawaj z pestkami"),
+        authorName = "ByteBites Chef"
     )
 
     CookbookTheme {
         RecipeDetailContent(
-            state = RecipeDetailState(recipeDetail = sampleDetail),
+            state = RecipeDetailState(recipeDetail = sampleDetail, isLoading = false),
             onIntent = {}
         )
     }
@@ -173,6 +176,17 @@ fun RecipeDetailContentLoadingPreview() {
     CookbookTheme {
         RecipeDetailContent(
             state = RecipeDetailState(isLoading = true),
+            onIntent = {}
+        )
+    }
+}
+
+@Composable
+@Preview
+fun RecipeDetailContentErrorPreview() {
+    CookbookTheme {
+        RecipeDetailContent(
+            state = RecipeDetailState(error = "Nie znaleziono szczegółów przepisu", isLoading = false),
             onIntent = {}
         )
     }

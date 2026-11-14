@@ -4,7 +4,6 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import pl.bytebites.mobile.presentation.navigation.AppNavigator
 import pl.bytebites.mobile.presentation.screen.feed.interactor.FeedProvider
 import pl.bytebites.mobile.presentation.screen.feed.interactor.FeedProviderInteractor
 import pl.bytebites.mobile.presentation.screen.feed.viewmodel.FeedScreenViewModel
@@ -19,8 +18,6 @@ import pl.bytebites.mobile.presentation.screen.recipe_detail.viewmodel.RecipeDet
 import pl.bytebites.mobile.presentation.screen.recipe_detail.viewmodel.RecipeDetailViewModel
 
 val presentationModule = module {
-
-    single { AppNavigator() }
 
     factoryOf(::FeedProviderInteractor) bind FeedProvider::class
     factoryOf(::RecipeDetailProviderInteractor) bind RecipeDetailProvider::class

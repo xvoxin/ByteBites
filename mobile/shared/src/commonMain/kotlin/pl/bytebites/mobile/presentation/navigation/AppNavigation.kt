@@ -2,7 +2,6 @@ package pl.bytebites.mobile.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import pl.bytebites.mobile.presentation.screen.feed.view.FeedScreen
 import pl.bytebites.mobile.presentation.screen.feed.viewmodel.FeedViewModel
@@ -13,7 +12,7 @@ import pl.bytebites.mobile.presentation.screen.recipe_detail.viewmodel.RecipeDet
 
 @Composable
 fun AppNavigation(
-    navigator: AppNavigator = koinInject(),
+    navigator: AppNavigator = rememberAppNavigator(),
     modifier: Modifier = Modifier
 ) {
     val canGoBack = navigator.backStack.size > 1
