@@ -15,7 +15,7 @@ class RecipeDetailsProviderTest {
     private val recipeDetailsProvider = RepositoryRecipeDetailsProvider(fakeRecipeRepository)
 
     @Test
-    fun `when repository succeeds with recipe found, emit QueryState Value with recipe`() = runTest {
+    fun `emit recipe details when recipe found`() = runTest {
         fakeRecipeRepository.recipeDetailResult = Result.success(sampleRecipe())
 
         recipeDetailsProvider.provide("1").test {
@@ -27,7 +27,7 @@ class RecipeDetailsProviderTest {
     }
 
     @Test
-    fun `when repository succeeds but recipe is null, emit QueryState Value with null`() = runTest {
+    fun `emit null when recipe not found`() = runTest {
         fakeRecipeRepository.recipeDetailResult = Result.success(null)
 
         recipeDetailsProvider.provide("non_existent").test {
@@ -39,7 +39,7 @@ class RecipeDetailsProviderTest {
     }
 
     @Test
-    fun `when repository fails with exception, emit QueryState Error with throwable`() = runTest {
+    fun `emit error state on repository failure`() = runTest {
         fakeRecipeRepository.recipeDetailResult = Result.failure(sampleError)
 
         recipeDetailsProvider.provide("1").test {

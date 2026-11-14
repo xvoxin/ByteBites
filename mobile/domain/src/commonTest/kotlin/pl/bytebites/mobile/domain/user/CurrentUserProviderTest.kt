@@ -15,7 +15,7 @@ class CurrentUserProviderTest {
     private val currentUserProvider = RepositoryCurrentUserProvider(fakeAuthRepository)
 
     @Test
-    fun `when repository succeeds with active user, emit QueryState Value with user`() = runTest {
+    fun `emit active user when repository succeeds`() = runTest {
         fakeAuthRepository.currentUserResult = Result.success(sampleUser())
 
         currentUserProvider.provide().test {
@@ -27,7 +27,7 @@ class CurrentUserProviderTest {
     }
 
     @Test
-    fun `when repository succeeds with null, emit QueryState Value with null`() = runTest {
+    fun `emit null when guest session active`() = runTest {
         fakeAuthRepository.currentUserResult = Result.success(null)
 
         currentUserProvider.provide().test {
@@ -39,7 +39,7 @@ class CurrentUserProviderTest {
     }
 
     @Test
-    fun `when repository fails with exception, emit QueryState Error with throwable`() = runTest {
+    fun `emit error state on repository failure`() = runTest {
         fakeAuthRepository.currentUserResult = Result.failure(sampleError)
 
         currentUserProvider.provide().test {

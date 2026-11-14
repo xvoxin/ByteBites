@@ -15,7 +15,7 @@ class RecipeFeedProviderTest {
     private val recipeFeedProvider = RepositoryRecipeFeedProvider(fakeRecipeRepository)
 
     @Test
-    fun `when repository succeeds with recipes, emit QueryState Value with recipe list`() = runTest {
+    fun `emit recipe list on repository success`() = runTest {
         fakeRecipeRepository.recipes = sampleRecipes()
 
         recipeFeedProvider.provide().test {
@@ -27,7 +27,7 @@ class RecipeFeedProviderTest {
     }
 
     @Test
-    fun `when repository succeeds with empty list, emit QueryState Value with empty list`() = runTest {
+    fun `emit empty list when repository returns no recipes`() = runTest {
         fakeRecipeRepository.recipes = emptyList()
 
         recipeFeedProvider.provide().test {
@@ -39,7 +39,7 @@ class RecipeFeedProviderTest {
     }
 
     @Test
-    fun `when repository fails with exception, emit QueryState Error with throwable`() = runTest {
+    fun `emit error state on repository failure`() = runTest {
         fakeRecipeRepository.recipesResult = Result.failure(sampleError)
 
         recipeFeedProvider.provide().test {

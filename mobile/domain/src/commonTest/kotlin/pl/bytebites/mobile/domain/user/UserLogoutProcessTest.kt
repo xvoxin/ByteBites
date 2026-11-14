@@ -14,7 +14,7 @@ class UserLogoutProcessTest {
     private val userLogoutProcess = SessionTerminationProcess(fakeAuthRepository)
 
     @Test
-    fun `when repository logout succeeds, emit CommandState Success`() = runTest {
+    fun `emit success on repository logout`() = runTest {
         fakeAuthRepository.logoutResult = Result.success(Unit)
 
         userLogoutProcess.logout().test {
@@ -26,7 +26,7 @@ class UserLogoutProcessTest {
     }
 
     @Test
-    fun `when repository logout fails with exception, emit CommandState Error with throwable`() = runTest {
+    fun `emit error state on repository failure`() = runTest {
         fakeAuthRepository.logoutResult = Result.failure(sampleError)
 
         userLogoutProcess.logout().test {
