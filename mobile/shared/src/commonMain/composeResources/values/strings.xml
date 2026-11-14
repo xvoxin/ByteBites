@@ -1,0 +1,5 @@
+<resources>
+    <string name="error_default_title">Błąd</string>
+    <string name="error_default_message">Nieoczekiwany błąd aplikacji</string>
+    <string name="error_dialog_button_ok">OK</string>
+</resources>

@@ -1,9 +1,13 @@
 package pl.bytebites.mobile.presentation.error
 
 import app.cash.turbine.test
+import bytebites.shared.generated.resources.Res
+import bytebites.shared.generated.resources.error_default_message
+import bytebites.shared.generated.resources.error_default_title
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
+import pl.bytebites.mobile.presentation.resource.StringValue
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -32,8 +36,79 @@ class ErrorHandlerTest {
 
             val errorState = awaitItem()
             assertNotNull(errorState)
-            assertEquals("Błąd bazy", errorState.title)
-            assertEquals("Database connection failed", errorState.message)
+            assertEquals(StringValue.Const("Błąd bazy"), errorState.title)
+            assertEquals(StringValue.Const("Database connection failed"), errorState.message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `showError without title falls back to default resource title`() = runTest {
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            errorHandler.showError(IllegalStateException("Something went wrong"))
+
+            val errorState = awaitItem()
+            assertNotNull(errorState)
+            assertEquals(StringValue.Resource(Res.string.error_default_title), errorState.title)
+            assertEquals(StringValue.Const("Something went wrong"), errorState.message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `showError with empty message falls back to default resource message`() = runTest {
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            errorHandler.showError(RuntimeException(""))
+
+            val errorState = awaitItem()
+            assertNotNull(errorState)
+            assertEquals(StringValue.Resource(Res.string.error_default_message), errorState.message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `showError with blank whitespace message falls back to default resource message`() = runTest {
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            errorHandler.showError(RuntimeException("   "))
+
+            val errorState = awaitItem()
+            assertNotNull(errorState)
+            assertEquals(StringValue.Resource(Res.string.error_default_message), errorState.message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `showError with null message falls back to default resource message`() = runTest {
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            errorHandler.showError(RuntimeException(null as String?))
+
+            val errorState = awaitItem()
+            assertNotNull(errorState)
+            assertEquals(StringValue.Resource(Res.string.error_default_message), errorState.message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `showError with blank title falls back to default resource title`() = runTest {
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            errorHandler.showError(Exception("Test"), title = "   ")
+
+            val errorState = awaitItem()
+            assertNotNull(errorState)
+            assertEquals(StringValue.Resource(Res.string.error_default_title), errorState.title)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -66,6 +141,22 @@ class ErrorHandlerTest {
     }
 
     @Test
+    fun `invoking onDismiss on ErrorDialogState resets errorDialog state to null`() = runTest {
+        errorHandler.showError(Exception("Some error"))
+
+        errorHandler.errorDialog.test {
+            val activeError = awaitItem()
+            assertNotNull(activeError)
+
+            activeError.onDismiss()
+
+            val dismissedState = awaitItem()
+            assertNull(dismissedState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `catchToError operator intercepts flow exception and forwards to errorHandler`() = runTest {
         val failingFlow = flow<String> {
             emit("First item")
@@ -84,7 +175,30 @@ class ErrorHandlerTest {
 
             val errorState = awaitItem()
             assertNotNull(errorState)
-            assertEquals("Network timeout", errorState.message)
+            assertEquals(StringValue.Resource(Res.string.error_default_title), errorState.title)
+            assertEquals(StringValue.Const("Network timeout"), errorState.message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `catchToError with custom title updates errorDialog state with custom title`() = runTest {
+        val failingFlow = flow<String> {
+            throw RuntimeException("Network timeout")
+        }
+
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            failingFlow
+                .catchToError(errorHandler, title = "Custom Title")
+                .test {
+                    awaitComplete()
+                }
+
+            val errorState = awaitItem()
+            assertNotNull(errorState)
+            assertEquals(StringValue.Const("Custom Title"), errorState.title)
             cancelAndIgnoreRemainingEvents()
         }
     }

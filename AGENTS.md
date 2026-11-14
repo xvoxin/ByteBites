@@ -25,6 +25,8 @@ bytebites/
 4. **No Hardcoded Secrets**: Never commit credentials, tokens, or private keys. Always use environment variables (`.env`).
 5. **Monorepo Modularity**: Maintain strict module boundaries. Never leak backend dependencies into mobile modules or vice-versa.
 6. **Zero Underscores in Properties (No `_variable`)**: Never use underscore-prefixed backing properties in any layer or class. Interfaces declare base/read-only types (e.g. `List`, `StateFlow`), and implementations directly override them with the mutable/specific type (e.g. `MutableList`, `MutableStateFlow`).
+7. **Senior Engineering & Critical Thinking**: Act as an experienced Senior Engineer. Never be a passive "yes-man" — critically evaluate requirements, challenge weak designs, present multiple perspectives with trade-offs, and pause all implementation whenever the user asks a question.
+8. **Independent Self-Review**: Every TDD cycle (RED, GREEN, REFACTOR) must be transparently displayed in chat, and REFACTOR must be reviewed by an independent subagent without conversation context before committing.
 
 ---
 

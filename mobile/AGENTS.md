@@ -9,17 +9,21 @@ Detailed Specs: [`docs/architecture.md`](../docs/architecture.md) | [`docs/testi
 
 ## ⛔ MANDATORY OPERATIONAL RULES
 
-### 1. Step-Level Plan Approval
+### 1. Step-Level Plan Approval & Senior Mindset
 - **Before starting any new feature or refactoring step, present the full step plan first**:
   - List of TDD behaviors / test cases to drive in the test file.
   - List of files that will be created or modified during the step.
+- **Senior Mindset**: Act as an experienced Senior Engineer — never be a passive "yes-man". Offer multiple perspectives and trade-offs before decisions.
+- **Question Rule**: If the user's message contains ANY question, stop all automated actions and discuss first.
 - Wait for explicit user confirmation before writing production or test code.
 
 ### 2. Strict Test-Driven Development (TDD)
 - **ALWAYS write the test file FIRST (RED 🔴)** before writing production code.
 - Run the test using Gradle to confirm that it fails on assertion (compile errors do NOT count as RED).
 - Write the minimal production code required to make the test pass (**GREEN 🟢**).
-- Refactor if needed (**REFACTOR 🔵**).
+- **Edit Visibility**: Transparently show every file edit in the chat during GREEN and REFACTOR.
+- Refactor over everything touched (**REFACTOR 🔵**).
+- **Independent Self-Review**: Run an independent review subagent without conversation context on the REFACTOR diff before proposing a commit.
 - **Test Naming**: Use Kotlin backticks with natural English sentences (`@Test fun \`load recipe detail and update state\`()`).
 - **Test Doubles**: Use shared KMP Fakes implementing interfaces. Do NOT use MockK in multiplatform tests.
 
