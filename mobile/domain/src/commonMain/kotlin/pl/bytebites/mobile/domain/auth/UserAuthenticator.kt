@@ -9,12 +9,12 @@ class UserAuthenticator(
         if (email.isBlank() || password.isBlank()) {
             return Result.failure(IllegalArgumentException("Email and password cannot be empty."))
         }
-        authRepository.login(email, password)
-        return Result.success(Unit)
+        return runCatching {
+            authRepository.login(email, password)
+        }
     }
 
-    suspend fun logout(): Result<Unit> {
+    suspend fun logout(): Result<Unit> = runCatching {
         authRepository.logout()
-        return Result.success(Unit)
     }
 }
