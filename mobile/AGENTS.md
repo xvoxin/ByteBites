@@ -34,10 +34,10 @@ Detailed Specs: [`docs/architecture.md`](../docs/architecture.md) | [`docs/testi
 ### 4. Architectural & Code Standards
 - **Screen Package Layout**: Strictly `pl.bytebites.mobile.presentation.screen.<feature>/` containing `view`, `viewmodel`, `model`, `interactor`. The package name `ui` is strictly forbidden.
 - **Presentation Interactor Rule**: Domain components are NEVER injected directly into ViewModels. ViewModels inject Presentation Interactors, which catch domain exceptions, map domain models to UI models, and manage error states.
+- **Zero Underscores in Properties (Global Rule)**: Absolutely no underscore-prefixed properties (e.g. `_state`, `_errorDialog`) in any class or layer. Interfaces define read-only contracts (`StateFlow`, `List`), and implementations directly override with the concrete/mutable type (`override val state = MutableStateFlow(...)`, `override val errorDialog = MutableStateFlow(...)`).
 - **Koin & ViewModel Lifecycle**:
   - Inside Composables, always acquire ViewModels via `koinViewModel()`, NEVER `koinInject()`.
   - Injected dependencies must implement an interface. Never use the `Impl` suffix (e.g. `InMemoryRecipeRepository`, `ProfileProviderInteractor`).
-  - ViewModels override `override val state = MutableStateFlow(...)` directly without duplicating `_state` and `state`.
 - **Localization & Zero Hardcoded Strings**: All UI text, button labels, content descriptions, and error messages MUST be defined in `shared/src/commonMain/composeResources/values/strings.xml` (`Res.string.*`). Zero hardcoded text in Composables or ViewModels! Use `<plurals>` for countable items.
 - **UI Tokens & Assets**: Use `Dimen.*` constants and `CookbookColor.*`. Raw `.dp`/`.sp` numbers inside `@Composable` functions are forbidden. Save vector assets as Android Vector XML (`.xml`) in `shared/src/commonMain/composeResources/drawable/`.
 

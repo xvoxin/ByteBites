@@ -1,0 +1,92 @@
+package pl.bytebites.mobile.presentation.error
+
+import app.cash.turbine.test
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.runTest
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+
+class ErrorHandlerTest {
+
+    private val errorHandler = DefaultErrorHandler()
+
+    @Test
+    fun `initial error dialog state is null`() = runTest {
+        errorHandler.errorDialog.test {
+            val state = awaitItem()
+            assertNull(state, "Initial errorDialog state should be null")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `showError updates errorDialog state with title and exception message`() = runTest {
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            val exception = IllegalStateException("Database connection failed")
+            errorHandler.showError(exception, title = "Błąd bazy")
+
+            val errorState = awaitItem()
+            assertNotNull(errorState)
+            assertEquals("Błąd bazy", errorState.title)
+            assertEquals("Database connection failed", errorState.message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `showError ignores CancellationException and keeps state null`() = runTest {
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            errorHandler.showError(CancellationException("Job was cancelled"))
+
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `dismissError resets errorDialog state back to null`() = runTest {
+        errorHandler.showError(Exception("Some error"))
+
+        errorHandler.errorDialog.test {
+            val activeError = awaitItem()
+            assertNotNull(activeError)
+
+            errorHandler.dismissError()
+
+            val dismissedState = awaitItem()
+            assertNull(dismissedState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `catchToError operator intercepts flow exception and forwards to errorHandler`() = runTest {
+        val failingFlow = flow<String> {
+            emit("First item")
+            throw RuntimeException("Network timeout")
+        }
+
+        errorHandler.errorDialog.test {
+            assertEquals(null, awaitItem())
+
+            failingFlow
+                .catchToError(errorHandler)
+                .test {
+                    assertEquals("First item", awaitItem())
+                    awaitComplete()
+                }
+
+            val errorState = awaitItem()
+            assertNotNull(errorState)
+            assertEquals("Network timeout", errorState.message)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+}

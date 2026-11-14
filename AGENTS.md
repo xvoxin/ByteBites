@@ -24,6 +24,7 @@ bytebites/
 3. **English Code**: All code, identifiers, comments, documentation, and git commit messages must be in English. User-facing strings must reside in localization resource files (`strings.xml`), never hardcoded in code.
 4. **No Hardcoded Secrets**: Never commit credentials, tokens, or private keys. Always use environment variables (`.env`).
 5. **Monorepo Modularity**: Maintain strict module boundaries. Never leak backend dependencies into mobile modules or vice-versa.
+6. **Zero Underscores in Properties (No `_variable`)**: Never use underscore-prefixed backing properties in any layer or class. Interfaces declare base/read-only types (e.g. `List`, `StateFlow`), and implementations directly override them with the mutable/specific type (e.g. `MutableList`, `MutableStateFlow`).
 
 ---
 
