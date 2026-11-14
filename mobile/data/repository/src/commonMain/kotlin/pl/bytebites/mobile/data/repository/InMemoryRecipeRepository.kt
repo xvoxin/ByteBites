@@ -1,53 +1,26 @@
 package pl.bytebites.mobile.data.repository
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import pl.bytebites.mobile.domain.model.Recipe
 import pl.bytebites.mobile.domain.repository.RecipeRepository
 
 class InMemoryRecipeRepository : RecipeRepository {
 
-    private val recipesFlow = MutableStateFlow(initialRecipesList)
+    private val recipes = initialRecipesList
 
-    override fun getRecipes(): Flow<List<Recipe>> = recipesFlow.asStateFlow()
-
-    override fun getFeaturedRecipe(): Flow<Recipe?> {
-        return recipesFlow.map { list ->
-            list.firstOrNull { it.isFeatured } ?: list.firstOrNull()
-        }
+    override suspend fun getRecipes(): Result<List<Recipe>> {
+        return Result.success(recipes)
     }
 
-    override suspend fun toggleFavorite(recipeId: String) {
-        val current = recipesFlow.value
-        val updated = current.map { recipe ->
-            if (recipe.id == recipeId) {
-                recipe.copy(isFavorite = !recipe.isFavorite)
-            } else {
-                recipe
-            }
-        }
-        recipesFlow.value = updated
-    }
-
-    override suspend fun addRecipe(recipe: Recipe) {
-        val current = recipesFlow.value
-        recipesFlow.value = listOf(recipe) + current
-    }
-
-    override suspend fun deleteRecipe(recipeId: String) {
-        val current = recipesFlow.value
-        recipesFlow.value = current.filterNot { it.id == recipeId }
+    override suspend fun getRecipeById(id: String): Result<Recipe?> {
+        return Result.success(recipes.find { it.id == id })
     }
 
     companion object {
+
         private val initialRecipesList = listOf(
             Recipe(
                 id = "1",
                 title = "Kremowa Zupa Dyniowa z Imbirem",
-                categoryId = "mains",
-                categoryName = "Obiady & Kolacje",
                 prepTime = "30 min",
                 difficulty = "Łatwe",
                 rating = 4.9,
@@ -67,15 +40,11 @@ class InMemoryRecipeRepository : RecipeRepository {
                     "Dodaj upieczoną dynię, zalej bulionem i gotuj 10 minut.",
                     "Zblenduj całość na gładki krem z mleczkiem kokosowym.",
                     "Podawaj na gorąco z prażonymi pestkami."
-                ),
-                isFavorite = true,
-                isFeatured = true
+                )
             ),
             Recipe(
                 id = "2",
                 title = "Klasyczna Szakszuka z Fetą",
-                categoryId = "breakfast",
-                categoryName = "Śniadania & Brunsze",
                 prepTime = "20 min",
                 difficulty = "Łatwe",
                 rating = 4.8,
@@ -96,15 +65,11 @@ class InMemoryRecipeRepository : RecipeRepository {
                     "Zrób wgłębienia w sosie i wbij jajka.",
                     "Przykryj patelnię i gotuj na wolnym ogniu około 5 minut, aż białka ściągną się.",
                     "Posyp pokruszoną fetą i kolendrą."
-                ),
-                isFavorite = true,
-                isFeatured = false
+                )
             ),
             Recipe(
                 id = "3",
                 title = "Tarta z Malinami i Mascarpone",
-                categoryId = "desserts",
-                categoryName = "Desery & Wypieki",
                 prepTime = "45 min",
                 difficulty = "Średnie",
                 rating = 5.0,
@@ -124,10 +89,10 @@ class InMemoryRecipeRepository : RecipeRepository {
                     "Rozpuść białą czekoladę i zmiksuj z serem mascarpone na gładką masę.",
                     "Wyłóż krem na ostudzony spód tarty.",
                     "Ułóż gęsto maliny i udekoruj listkami mięty."
-                ),
-                isFavorite = false,
-                isFeatured = false
+                )
             )
         )
+
     }
+
 }
