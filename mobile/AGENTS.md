@@ -48,6 +48,8 @@ Detailed Specs: [`docs/architecture.md`](../docs/architecture.md) | [`docs/testi
   - `sealed interface` / `sealed class`: Empty line after `{`, empty line between every subtype/case, empty line before `}`.
   - `interface` / `class`: Empty line after `{`, empty line between properties and methods, empty line before `}`.
   - `data class`: Every constructor parameter/property on its own separate line.
+  - Expression-body functions wrapping multi-line blocks (e.g. `queryFlow { ... }`): `=` on declaration line, newline, and indent expression on the next line.
+  - Clean Test Fixtures: Test data (factories, fixtures, sample values) must reside outside test method bodies (e.g. private helper functions/properties). Test methods contain only visible execution and assertions.
 
 ---
 
