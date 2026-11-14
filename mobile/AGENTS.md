@@ -44,6 +44,10 @@ Detailed Specs: [`docs/architecture.md`](../docs/architecture.md) | [`docs/testi
   - Injected dependencies must implement an interface. Never use the `Impl` suffix (e.g. `InMemoryRecipeRepository`, `ProfileProviderInteractor`).
 - **Localization & Zero Hardcoded Strings**: All UI text, button labels, content descriptions, and error messages MUST be defined in `shared/src/commonMain/composeResources/values/strings.xml` (`Res.string.*`). Zero hardcoded text in Composables or ViewModels! Use `<plurals>` for countable items.
 - **UI Tokens & Assets**: Use `Dimen.*` constants and `CookbookColor.*`. Raw `.dp`/`.sp` numbers inside `@Composable` functions are forbidden. Save vector assets as Android Vector XML (`.xml`) in `shared/src/commonMain/composeResources/drawable/`.
+- **Code Formatting & Spacing**:
+  - `sealed interface` / `sealed class`: Empty line after `{`, empty line between every subtype/case, empty line before `}`.
+  - `interface` / `class`: Empty line after `{`, empty line between properties and methods, empty line before `}`.
+  - `data class`: Every constructor parameter/property on its own separate line.
 
 ---
 
