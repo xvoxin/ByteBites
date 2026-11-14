@@ -22,8 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import bytebites.shared.generated.resources.Res
+import bytebites.shared.generated.resources.recipe_detail_not_found
 import kotlinx.coroutines.flow.collectLatest
 import pl.bytebites.mobile.presentation.navigation.BackTopBar
+import pl.bytebites.mobile.presentation.resource.StringValue
+import pl.bytebites.mobile.presentation.resource.asString
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetail
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailEffect
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailIntent
@@ -100,7 +104,7 @@ fun RecipeDetailContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = state.error,
+                            text = state.error.asString(),
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                             textAlign = TextAlign.Center
                         )
@@ -186,7 +190,10 @@ fun RecipeDetailContentLoadingPreview() {
 fun RecipeDetailContentErrorPreview() {
     CookbookTheme {
         RecipeDetailContent(
-            state = RecipeDetailState(error = "Nie znaleziono szczegółów przepisu", isLoading = false),
+            state = RecipeDetailState(
+                error = StringValue.Resource(Res.string.recipe_detail_not_found),
+                isLoading = false
+            ),
             onIntent = {}
         )
     }

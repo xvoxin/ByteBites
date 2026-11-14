@@ -1,6 +1,8 @@
 package pl.bytebites.mobile.presentation.screen.recipe_detail
 
 import app.cash.turbine.test
+import bytebites.shared.generated.resources.Res
+import bytebites.shared.generated.resources.recipe_detail_not_found
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -111,6 +113,20 @@ class RecipeDetailScreenViewModelTest {
         viewModel.dismissError()
 
         assertNull(viewModel.errorDialog.value, "errorDialog should be null after dismissal")
+    }
+
+    @Test
+    fun `when recipe detail is not found, update state with not found error and set isLoading to false`() = runTest {
+        viewModel.state.test {
+            viewModel.onIntent(RecipeDetailIntent.LoadRecipeDetail("non_existing_id"))
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            val state = expectMostRecentItem()
+            assertFalse(state.isLoading)
+            assertNull(state.recipeDetail)
+            assertEquals(StringValue.Resource(Res.string.recipe_detail_not_found), state.error)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
 }
