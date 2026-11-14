@@ -1,9 +1,5 @@
 package pl.bytebites.mobile.domain
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import pl.bytebites.mobile.domain.model.Recipe
 import pl.bytebites.mobile.domain.repository.RecipeRepository
 
@@ -11,25 +7,16 @@ class FakeRecipeRepository(
     initialRecipes: List<Recipe> = emptyList()
 ) : RecipeRepository {
 
-    private val recipesFlow = MutableStateFlow(initialRecipes)
+    var recipes: List<Recipe> = initialRecipes
+    var recipesResult: Result<List<Recipe>>? = null
+    var recipeDetailResult: Result<Recipe?>? = null
 
-    override fun getRecipes(): Flow<List<Recipe>> = recipesFlow.asStateFlow()
-
-    override fun getFeaturedRecipe(): Flow<Recipe?> {
-        return recipesFlow.map { list -> list.firstOrNull { it.isFeatured } }
+    override suspend fun getRecipes(): Result<List<Recipe>> {
+        return recipesResult ?: Result.success(recipes)
     }
 
-    override suspend fun toggleFavorite(recipeId: String) {
-        recipesFlow.value = recipesFlow.value.map {
-            if (it.id == recipeId) it.copy(isFavorite = !it.isFavorite) else it
-        }
+    override suspend fun getRecipeById(id: String): Result<Recipe?> {
+        return recipeDetailResult ?: Result.success(recipes.find { it.id == id })
     }
 
-    override suspend fun addRecipe(recipe: Recipe) {
-        recipesFlow.value = listOf(recipe) + recipesFlow.value
-    }
-
-    override suspend fun deleteRecipe(recipeId: String) {
-        recipesFlow.value = recipesFlow.value.filterNot { it.id == recipeId }
-    }
 }
