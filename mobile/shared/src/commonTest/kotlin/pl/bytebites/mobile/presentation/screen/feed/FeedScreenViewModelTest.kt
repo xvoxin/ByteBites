@@ -3,16 +3,20 @@ package pl.bytebites.mobile.presentation.screen.feed
 import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import pl.bytebites.mobile.domain.model.Recipe
-import pl.bytebites.mobile.domain.provider.RecipeProvider
-import pl.bytebites.mobile.presentation.screen.feed.interactor.FeedProviderInteractor
+import pl.bytebites.mobile.presentation.resource.StringValue
+import pl.bytebites.mobile.presentation.screen.feed.interactor.FeedProvider
+import pl.bytebites.mobile.presentation.screen.feed.interactor.FeedProvidingState
 import pl.bytebites.mobile.presentation.screen.feed.model.FeedEffect
 import pl.bytebites.mobile.presentation.screen.feed.model.FeedIntent
+import pl.bytebites.mobile.presentation.screen.feed.model.Recipe
 import pl.bytebites.mobile.presentation.screen.feed.viewmodel.FeedScreenViewModel
+import pl.bytebites.mobile.presentation.state.QueryState
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -20,41 +24,28 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import pl.bytebites.mobile.presentation.resource.StringValue
+
+class FakeFeedProvider : FeedProvider {
+
+    val recipesFlow = MutableStateFlow<FeedProvidingState>(QueryState.Value(emptyList()))
+
+    override fun provideRecipes(): Flow<FeedProvidingState> = recipesFlow
+
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FeedScreenViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
-
-    private val sampleRecipes = listOf(
-        Recipe(
-            id = "1",
-            title = "Test Recipe",
-            categoryId = "mains",
-            categoryName = "Obiady",
-            prepTime = "10 min",
-            difficulty = "Łatwe",
-            rating = 5.0,
-            servings = 2,
-            description = "Test",
-            ingredients = listOf("a"),
-            steps = listOf("b")
-        )
-    )
-
-    private lateinit var repository: FakeRecipeRepository
-    private lateinit var recipeProvider: RecipeProvider
-    private lateinit var interactor: FeedProviderInteractor
+    private lateinit var feedProvider: FakeFeedProvider
     private lateinit var viewModel: FeedScreenViewModel
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        repository = FakeRecipeRepository(sampleRecipes)
-        recipeProvider = RecipeProvider(repository)
-        interactor = FeedProviderInteractor(recipeProvider)
-        viewModel = FeedScreenViewModel(interactor)
+        feedProvider = FakeFeedProvider()
+        feedProvider.recipesFlow.value = QueryState.Value(sampleRecipes)
+        viewModel = FeedScreenViewModel(feedProvider)
     }
 
     @AfterTest
@@ -86,7 +77,7 @@ class FeedScreenViewModelTest {
     }
 
     @Test
-    fun `emit navigate to profile effect on profile icon click`() = runTest {
+    fun `emit navigate to profile effect on profile click`() = runTest {
         viewModel.effect.test {
             viewModel.onIntent(FeedIntent.ProfileClicked)
             testDispatcher.scheduler.advanceUntilIdle()
@@ -97,31 +88,42 @@ class FeedScreenViewModelTest {
     }
 
     @Test
-    fun `when recipes loading fails, update errorDialog state and set isLoading to false`() = runTest {
-        repository.errorToThrow = RuntimeException("Failed to fetch recipes")
-        val failingViewModel = FeedScreenViewModel(interactor)
+    fun `update error dialog and set loading false on recipes loading failure`() = runTest {
+        feedProvider.recipesFlow.value = QueryState.Error(sampleError)
 
-        failingViewModel.errorDialog.test {
+        viewModel.errorDialog.test {
             testDispatcher.scheduler.advanceUntilIdle()
 
             val errorState = expectMostRecentItem()
-            assertNotNull(errorState, "errorDialog state should not be null on failure")
+            assertNotNull(errorState)
             assertEquals(StringValue.Const("Failed to fetch recipes"), errorState.message)
-            assertFalse(failingViewModel.state.value.isLoading, "isLoading should be false after error")
+            assertFalse(viewModel.state.value.isLoading)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when error is dismissed, errorDialog state resets to null`() = runTest {
-        repository.errorToThrow = RuntimeException("Failed to fetch recipes")
-        val failingViewModel = FeedScreenViewModel(interactor)
+    fun `reset error dialog when error dismissed`() = runTest {
+        feedProvider.recipesFlow.value = QueryState.Error(sampleError)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        assertNotNull(failingViewModel.errorDialog.value, "errorDialog should be present before dismissal")
-        failingViewModel.dismissError()
+        assertNotNull(viewModel.errorDialog.value)
+        viewModel.dismissError()
 
-        assertNull(failingViewModel.errorDialog.value, "errorDialog should be null after dismissal")
+        assertNull(viewModel.errorDialog.value)
     }
+
+    private val sampleError = RuntimeException("Failed to fetch recipes")
+
+    private val sampleRecipes = listOf(
+        Recipe(
+            id = "1",
+            title = "Test Recipe",
+            categoryName = "*Kategoria*",
+            prepTime = "10 min",
+            difficulty = "Łatwe",
+            rating = "5.0"
+        )
+    )
 
 }

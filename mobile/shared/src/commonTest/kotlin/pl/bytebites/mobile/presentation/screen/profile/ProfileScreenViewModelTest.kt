@@ -5,18 +5,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import pl.bytebites.mobile.presentation.resource.StringValue
-import pl.bytebites.mobile.presentation.screen.profile.interactor.ProfileProvider
+import pl.bytebites.mobile.presentation.screen.profile.interactor.CurrentUserProvidingState
+import pl.bytebites.mobile.presentation.screen.profile.interactor.LogoutProcessingState
+import pl.bytebites.mobile.presentation.screen.profile.interactor.ProfileUserProvider
+import pl.bytebites.mobile.presentation.screen.profile.interactor.UserLogoutProcess
 import pl.bytebites.mobile.presentation.screen.profile.model.ProfileEffect
 import pl.bytebites.mobile.presentation.screen.profile.model.ProfileIntent
 import pl.bytebites.mobile.presentation.screen.profile.model.ProfileUser
 import pl.bytebites.mobile.presentation.screen.profile.viewmodel.ProfileScreenViewModel
+import pl.bytebites.mobile.presentation.state.CommandState
+import pl.bytebites.mobile.presentation.state.QueryState
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -25,31 +29,22 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class FakeProfileProvider(
-    initialUser: ProfileUser? = null
-) : ProfileProvider {
+class FakeProfileUserProvider : ProfileUserProvider {
 
-    val userFlow = MutableStateFlow(initialUser)
-    var currentUserError: Throwable? = null
-    var logoutResult: Result<Unit> = Result.success(Unit)
+    val userFlow = MutableStateFlow<CurrentUserProvidingState>(QueryState.Value(null))
+
+    override fun provideCurrentUser(): Flow<CurrentUserProvidingState> = userFlow
+
+}
+
+class FakeUserLogoutProcess : UserLogoutProcess {
+
+    var logoutState: LogoutProcessingState = CommandState.Success
     var logoutCallCount = 0
 
-    override fun getCurrentUser(): Flow<ProfileUser?> = flow {
-        val error = currentUserError
-        if (error != null) {
-            throw error
-        } else {
-            emitAll(userFlow)
-        }
-    }
-
-    override suspend fun logout(): Result<Unit> {
+    override fun logout(): Flow<LogoutProcessingState> = flow {
         logoutCallCount++
-        val result = logoutResult
-        if (result.isSuccess) {
-            userFlow.value = null
-        }
-        return result
+        emit(logoutState)
     }
 
 }
@@ -58,14 +53,16 @@ class FakeProfileProvider(
 class ProfileScreenViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
-    private lateinit var fakeProvider: FakeProfileProvider
+    private lateinit var userProvider: FakeProfileUserProvider
+    private lateinit var logoutProcess: FakeUserLogoutProcess
     private lateinit var viewModel: ProfileScreenViewModel
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        fakeProvider = FakeProfileProvider()
-        viewModel = ProfileScreenViewModel(fakeProvider)
+        userProvider = FakeProfileUserProvider()
+        logoutProcess = FakeUserLogoutProcess()
+        viewModel = ProfileScreenViewModel(userProvider, logoutProcess)
     }
 
     @AfterTest
@@ -86,16 +83,9 @@ class ProfileScreenViewModelTest {
 
     @Test
     fun `emit user nickname when user is logged in`() = runTest {
-        val sampleUser = ProfileUser(
-            id = "u1",
-            displayName = "Ania",
-            username = "@ania_cooks",
-            email = "ania@bytebites.pl"
-        )
-        val loggedInProvider = FakeProfileProvider(sampleUser)
-        val loggedInViewModel = ProfileScreenViewModel(loggedInProvider)
+        userProvider.userFlow.value = QueryState.Value(sampleUser)
 
-        loggedInViewModel.state.test {
+        viewModel.state.test {
             testDispatcher.scheduler.advanceUntilIdle()
 
             val state = expectMostRecentItem()
@@ -118,92 +108,73 @@ class ProfileScreenViewModelTest {
 
     @Test
     fun `logout user when logout button clicked`() = runTest {
-        val sampleUser = ProfileUser(
-            id = "u1",
-            displayName = "Ania",
-            username = "@ania_cooks",
-            email = "ania@bytebites.pl"
-        )
-        fakeProvider.userFlow.value = sampleUser
+        userProvider.userFlow.value = QueryState.Value(sampleUser)
 
-        viewModel.state.test {
-            viewModel.onIntent(ProfileIntent.LogoutClicked)
-            testDispatcher.scheduler.advanceUntilIdle()
+        viewModel.onIntent(ProfileIntent.LogoutClicked)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-            val state = expectMostRecentItem()
-            assertNull(state.user)
-        }
+        assertEquals(1, logoutProcess.logoutCallCount)
     }
 
     @Test
-    fun `when observe user fails, update errorDialog state and set isLoading to false`() = runTest {
-        val failingProvider = FakeProfileProvider().apply {
-            currentUserError = RuntimeException("Failed to fetch user profile")
-        }
-        val failingViewModel = ProfileScreenViewModel(failingProvider)
+    fun `update error dialog and set loading false on observe user failure`() = runTest {
+        userProvider.userFlow.value = QueryState.Error(sampleUserError)
 
-        failingViewModel.errorDialog.test {
+        viewModel.errorDialog.test {
             testDispatcher.scheduler.advanceUntilIdle()
 
             val errorState = expectMostRecentItem()
-            assertNotNull(errorState, "errorDialog state should not be null on failure")
+            assertNotNull(errorState)
             assertEquals(StringValue.Const("Failed to fetch user profile"), errorState.message)
-            assertFalse(failingViewModel.state.value.isLoading, "isLoading should be false after error")
+            assertFalse(viewModel.state.value.isLoading)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when logout fails, update errorDialog state`() = runTest {
-        val sampleUser = ProfileUser(
-            id = "u1",
-            displayName = "Ania",
-            username = "@ania_cooks",
-            email = "ania@bytebites.pl"
-        )
-        fakeProvider.userFlow.value = sampleUser
-        fakeProvider.logoutResult = Result.failure(RuntimeException("Logout failed due to network error"))
+    fun `update error dialog on logout failure`() = runTest {
+        logoutProcess.logoutState = CommandState.Error(sampleLogoutError)
 
         viewModel.errorDialog.test {
             viewModel.onIntent(ProfileIntent.LogoutClicked)
             testDispatcher.scheduler.advanceUntilIdle()
 
             val errorState = expectMostRecentItem()
-            assertNotNull(errorState, "errorDialog should be shown when logout fails")
+            assertNotNull(errorState)
             assertEquals(StringValue.Const("Logout failed due to network error"), errorState.message)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when error is dismissed, errorDialog state resets to null`() = runTest {
-        val failingProvider = FakeProfileProvider().apply {
-            currentUserError = RuntimeException("Failed to fetch user profile")
-        }
-        val failingViewModel = ProfileScreenViewModel(failingProvider)
+    fun `reset error dialog when error dismissed`() = runTest {
+        userProvider.userFlow.value = QueryState.Error(sampleUserError)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        assertNotNull(failingViewModel.errorDialog.value, "errorDialog should be present before dismissal")
-        failingViewModel.dismissError()
+        assertNotNull(viewModel.errorDialog.value)
+        viewModel.dismissError()
 
-        assertNull(failingViewModel.errorDialog.value, "errorDialog should be null after dismissal")
+        assertNull(viewModel.errorDialog.value)
     }
 
     @Test
-    fun `when logout is already running, duplicate logout clicks are ignored`() = runTest {
-        val sampleUser = ProfileUser(
-            id = "u1",
-            displayName = "Ania",
-            username = "@ania_cooks",
-            email = "ania@bytebites.pl"
-        )
-        fakeProvider.userFlow.value = sampleUser
-
+    fun `ignore duplicate logout clicks when logout is already running`() = runTest {
         viewModel.onIntent(ProfileIntent.LogoutClicked)
         viewModel.onIntent(ProfileIntent.LogoutClicked)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        assertEquals(1, fakeProvider.logoutCallCount)
+        assertEquals(1, logoutProcess.logoutCallCount)
     }
+
+    private val sampleUserError = RuntimeException("Failed to fetch user profile")
+
+    private val sampleLogoutError = RuntimeException("Logout failed due to network error")
+
+    private val sampleUser = ProfileUser(
+        id = "u1",
+        displayName = "Ania",
+        username = "@ania_cooks",
+        email = "ania@bytebites.pl"
+    )
 
 }

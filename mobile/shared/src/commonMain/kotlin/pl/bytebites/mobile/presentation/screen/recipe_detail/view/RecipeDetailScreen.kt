@@ -159,7 +159,7 @@ fun RecipeDetailContentSuccessPreview() {
         prepTime = "30 min",
         difficulty = "Łatwe",
         rating = "4.9",
-        servings = "4 porcje",
+        servings = "4",
         description = "Aromatyczna, rozgrzewająca zupa krem z pieczonej dyni.",
         ingredients = listOf("Dynia hokkaido", "Mleczko kokosowe", "Imbir"),
         steps = listOf("Upiecz dynię", "Zblenduj z mleczkiem", "Podawaj z pestkami"),

@@ -9,9 +9,10 @@ data class ProfileUser(
     val email: String
 )
 
-fun DomainUser.toProfileUser(): ProfileUser = ProfileUser(
-    id = id,
-    displayName = displayName,
-    username = "@$username",
-    email = email
-)
+fun DomainUser.toProfileUser(): ProfileUser =
+    ProfileUser(
+        id = id,
+        displayName = displayName,
+        username = if (username.startsWith("@")) username else "@$username",
+        email = email
+    )

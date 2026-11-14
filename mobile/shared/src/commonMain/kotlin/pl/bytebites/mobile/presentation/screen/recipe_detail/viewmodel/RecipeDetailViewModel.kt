@@ -11,6 +11,7 @@ import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailS
 abstract class RecipeDetailViewModel : ViewModel(), ErrorHandler {
 
     abstract val state: StateFlow<RecipeDetailState>
+
     abstract val effect: Flow<RecipeDetailEffect>
 
     abstract fun onIntent(intent: RecipeDetailIntent)

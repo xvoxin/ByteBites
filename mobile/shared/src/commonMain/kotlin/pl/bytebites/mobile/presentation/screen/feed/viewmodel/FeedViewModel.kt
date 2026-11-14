@@ -11,6 +11,7 @@ import pl.bytebites.mobile.presentation.screen.feed.model.FeedState
 abstract class FeedViewModel : ViewModel(), ErrorHandler {
 
     abstract val state: StateFlow<FeedState>
+
     abstract val effect: Flow<FeedEffect>
 
     abstract fun onIntent(intent: FeedIntent)

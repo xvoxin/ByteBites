@@ -7,7 +7,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -19,6 +18,7 @@ import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetail
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailEffect
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailIntent
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailState
+import pl.bytebites.mobile.presentation.state.QueryState
 
 class RecipeDetailScreenViewModel(
     private val recipeDetailProvider: RecipeDetailProvider,
@@ -28,13 +28,14 @@ class RecipeDetailScreenViewModel(
     override val state = MutableStateFlow(RecipeDetailState(isLoading = true))
 
     private val effectChannel = Channel<RecipeDetailEffect>(Channel.BUFFERED)
+
     override val effect: Flow<RecipeDetailEffect> = effectChannel.receiveAsFlow()
 
     private var loadRecipeDetailJob: Job? = null
 
     override fun onIntent(intent: RecipeDetailIntent) {
         when (intent) {
-            is RecipeDetailIntent.LoadRecipeDetail -> loadRecipeDetail(intent.recipeId)
+            is RecipeDetailIntent.LoadRecipeDetail -> provideRecipeDetail(intent.recipeId)
             is RecipeDetailIntent.BackClicked -> navigateBack()
         }
     }
@@ -45,17 +46,20 @@ class RecipeDetailScreenViewModel(
         }
     }
 
-    private fun loadRecipeDetail(recipeId: String) {
+    private fun provideRecipeDetail(recipeId: String) {
         loadRecipeDetailJob?.cancel()
         loadRecipeDetailJob = viewModelScope.launch {
             state.update { it.copy(isLoading = true, error = null) }
-            recipeDetailProvider.getRecipeById(recipeId)
-                .catch { handleLoadingError(it) }
-                .collect { handleRecipeDetailResult(it) }
+            recipeDetailProvider.provideRecipeDetail(recipeId).collect { queryState ->
+                when (queryState) {
+                    is QueryState.Value -> onRecipeDetailProvided(queryState.value)
+                    is QueryState.Error -> onProvidingError(queryState.throwable)
+                }
+            }
         }
     }
 
-    private fun handleRecipeDetailResult(detail: RecipeDetail?) {
+    private fun onRecipeDetailProvided(detail: RecipeDetail?) {
         if (detail != null) {
             state.update {
                 it.copy(
@@ -74,7 +78,7 @@ class RecipeDetailScreenViewModel(
         }
     }
 
-    private fun handleLoadingError(throwable: Throwable) {
+    private fun onProvidingError(throwable: Throwable) {
         showError(throwable)
         state.update { it.copy(isLoading = false) }
     }

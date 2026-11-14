@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -14,6 +13,8 @@ import pl.bytebites.mobile.presentation.screen.feed.interactor.FeedProvider
 import pl.bytebites.mobile.presentation.screen.feed.model.FeedEffect
 import pl.bytebites.mobile.presentation.screen.feed.model.FeedIntent
 import pl.bytebites.mobile.presentation.screen.feed.model.FeedState
+import pl.bytebites.mobile.presentation.screen.feed.model.Recipe
+import pl.bytebites.mobile.presentation.state.QueryState
 
 class FeedScreenViewModel(
     private val feedProvider: FeedProvider,
@@ -23,10 +24,11 @@ class FeedScreenViewModel(
     override val state = MutableStateFlow(FeedState(isLoading = true))
 
     private val effectChannel = Channel<FeedEffect>(Channel.BUFFERED)
+
     override val effect: Flow<FeedEffect> = effectChannel.receiveAsFlow()
 
     init {
-        loadRecipes()
+        provideRecipes()
     }
 
     override fun onIntent(intent: FeedIntent) {
@@ -45,23 +47,30 @@ class FeedScreenViewModel(
         }
     }
 
-    private fun loadRecipes() {
+    private fun provideRecipes() {
         viewModelScope.launch {
-            feedProvider.getRecipes()
-                .catch { throwable ->
-                    showError(throwable)
-                    state.update { it.copy(isLoading = false) }
+            feedProvider.provideRecipes().collect { queryState ->
+                when (queryState) {
+                    is QueryState.Value -> onRecipesProvided(queryState.value)
+                    is QueryState.Error -> onProvidingError(queryState.throwable)
                 }
-                .collect { recipes ->
-                    state.update {
-                        it.copy(
-                            recipes = recipes,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                }
+            }
         }
+    }
+
+    private fun onRecipesProvided(recipes: List<Recipe>) {
+        state.update {
+            it.copy(
+                recipes = recipes,
+                isLoading = false,
+                error = null
+            )
+        }
+    }
+
+    private fun onProvidingError(throwable: Throwable) {
+        showError(throwable)
+        state.update { it.copy(isLoading = false) }
     }
 
 }

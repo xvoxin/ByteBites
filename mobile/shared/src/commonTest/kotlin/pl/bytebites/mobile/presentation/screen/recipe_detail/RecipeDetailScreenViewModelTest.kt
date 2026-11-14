@@ -5,17 +5,20 @@ import bytebites.shared.generated.resources.Res
 import bytebites.shared.generated.resources.recipe_detail_not_found
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import pl.bytebites.mobile.domain.model.Recipe
-import pl.bytebites.mobile.domain.provider.RecipeDetailsProvider
-import pl.bytebites.mobile.presentation.screen.feed.FakeRecipeRepository
-import pl.bytebites.mobile.presentation.screen.recipe_detail.interactor.RecipeDetailProviderInteractor
+import pl.bytebites.mobile.presentation.resource.StringValue
+import pl.bytebites.mobile.presentation.screen.recipe_detail.interactor.RecipeDetailProvider
+import pl.bytebites.mobile.presentation.screen.recipe_detail.interactor.RecipeDetailProvidingState
+import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetail
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailEffect
 import pl.bytebites.mobile.presentation.screen.recipe_detail.model.RecipeDetailIntent
 import pl.bytebites.mobile.presentation.screen.recipe_detail.viewmodel.RecipeDetailScreenViewModel
+import pl.bytebites.mobile.presentation.state.QueryState
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -23,39 +26,28 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import pl.bytebites.mobile.presentation.resource.StringValue
+
+class FakeRecipeDetailProvider : RecipeDetailProvider {
+
+    val recipeDetailFlow = MutableStateFlow<RecipeDetailProvidingState>(QueryState.Value(null))
+
+    override fun provideRecipeDetail(id: String): Flow<RecipeDetailProvidingState> = recipeDetailFlow
+
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecipeDetailScreenViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
-
-    private val sampleRecipe = Recipe(
-        id = "recipe_100",
-        title = "Kremowa Zupa Dyniowa",
-        categoryId = "mains",
-        categoryName = "Obiady",
-        prepTime = "30 min",
-        difficulty = "Łatwe",
-        rating = 4.9,
-        servings = 4,
-        description = "Opis zupy",
-        ingredients = listOf("Dynia"),
-        steps = listOf("Ugotuj")
-    )
-
-    private lateinit var repository: FakeRecipeRepository
-    private lateinit var domainDetailsProvider: RecipeDetailsProvider
-    private lateinit var interactor: RecipeDetailProviderInteractor
+    private lateinit var recipeDetailProvider: FakeRecipeDetailProvider
     private lateinit var viewModel: RecipeDetailScreenViewModel
 
     @BeforeTest
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
-        repository = FakeRecipeRepository(listOf(sampleRecipe))
-        domainDetailsProvider = RecipeDetailsProvider(repository)
-        interactor = RecipeDetailProviderInteractor(domainDetailsProvider)
-        viewModel = RecipeDetailScreenViewModel(interactor)
+        recipeDetailProvider = FakeRecipeDetailProvider()
+        recipeDetailProvider.recipeDetailFlow.value = QueryState.Value(sampleRecipe)
+        viewModel = RecipeDetailScreenViewModel(recipeDetailProvider)
     }
 
     @AfterTest
@@ -88,35 +80,37 @@ class RecipeDetailScreenViewModelTest {
     }
 
     @Test
-    fun `when recipe detail loading fails, update errorDialog state and set isLoading to false`() = runTest {
-        repository.errorToThrow = RuntimeException("Failed to load recipe details")
+    fun `update error dialog and set loading false on recipe detail loading failure`() = runTest {
+        recipeDetailProvider.recipeDetailFlow.value = QueryState.Error(sampleError)
 
         viewModel.errorDialog.test {
             viewModel.onIntent(RecipeDetailIntent.LoadRecipeDetail("recipe_100"))
             testDispatcher.scheduler.advanceUntilIdle()
 
             val errorState = expectMostRecentItem()
-            assertNotNull(errorState, "errorDialog state should not be null on failure")
+            assertNotNull(errorState)
             assertEquals(StringValue.Const("Failed to load recipe details"), errorState.message)
-            assertFalse(viewModel.state.value.isLoading, "isLoading should be false after error")
+            assertFalse(viewModel.state.value.isLoading)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `when error is dismissed, errorDialog state resets to null`() = runTest {
-        repository.errorToThrow = RuntimeException("Failed to load recipe details")
+    fun `reset error dialog when error dismissed`() = runTest {
+        recipeDetailProvider.recipeDetailFlow.value = QueryState.Error(sampleError)
         viewModel.onIntent(RecipeDetailIntent.LoadRecipeDetail("recipe_100"))
         testDispatcher.scheduler.advanceUntilIdle()
 
-        assertNotNull(viewModel.errorDialog.value, "errorDialog should be present before dismissal")
+        assertNotNull(viewModel.errorDialog.value)
         viewModel.dismissError()
 
-        assertNull(viewModel.errorDialog.value, "errorDialog should be null after dismissal")
+        assertNull(viewModel.errorDialog.value)
     }
 
     @Test
-    fun `when recipe detail is not found, update state with not found error and set isLoading to false`() = runTest {
+    fun `update state with not found error when recipe detail is null`() = runTest {
+        recipeDetailProvider.recipeDetailFlow.value = QueryState.Value(null)
+
         viewModel.state.test {
             viewModel.onIntent(RecipeDetailIntent.LoadRecipeDetail("non_existing_id"))
             testDispatcher.scheduler.advanceUntilIdle()
@@ -128,5 +122,21 @@ class RecipeDetailScreenViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    private val sampleError = RuntimeException("Failed to load recipe details")
+
+    private val sampleRecipe = RecipeDetail(
+        id = "recipe_100",
+        title = "Kremowa Zupa Dyniowa",
+        categoryName = "*Kategoria*",
+        prepTime = "30 min",
+        difficulty = "Łatwe",
+        rating = "4.9",
+        servings = "4",
+        description = "Opis zupy",
+        ingredients = listOf("Dynia"),
+        steps = listOf("Ugotuj"),
+        authorName = "ByteBites Chef"
+    )
 
 }
