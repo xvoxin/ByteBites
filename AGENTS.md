@@ -1,50 +1,36 @@
-Welcome, AI assistant. You are helping develop ByteBites, a product-minded, full-stack culinary application. This file provides architectural guidelines, tech stack constraints, and engineering standards for this repository.
+# ByteBites Monorepo Guidelines
 
-1. Project Overview & Philosophy
-Project Name: ByteBites
+ByteBites is a product-minded culinary application featuring a shared Kotlin Multiplatform (KMP) client (Android, iOS, Web) and a Spring Boot (Kotlin) backend service.
 
-Goal: A robust, cross-platform culinary application with a shared Kotlin Multiplatform (KMP) client and a Spring Boot backend, deployed cost-effectively via Google Cloud Run.
+---
 
-Core Principles:
+## 🏛️ Monorepo Structure
 
-Docs-as-Code: Keep architectural notes and requirements updated in Markdown inside /docs or the root directory.
-
-Clean Architecture: Enforce clear separation of concerns (domain, data/infrastructure, presentation/UI) across both mobile and backend layers.
-
-English Code: All code, comments, documentation, and commit messages must be written in English.
-
-2. Tech Stack & Modules
-Plaintext
+```
 bytebites/
-├── backend/            # Spring Boot (Kotlin/Java) + PostgreSQL
-├── mobile/             # Kotlin Multiplatform (Compose Multiplatform)
-├── docs/               # Markdown documentation & specs
-├── docker-compose.yml  # Local infrastructure (PostgreSQL)
-├── requirements.md     # Full system specification
-└── AGENTS.md           # This context file
-Backend (/backend)
-Language/Framework: Kotlin / Spring Boot.
+├── backend/            # Spring Boot (Kotlin) REST API & PostgreSQL
+├── mobile/             # Kotlin Multiplatform (Compose Multiplatform) client
+├── docs/               # Technical specs, architecture, testing & roadmap
+├── requirements.md     # Full functional system specification
+└── AGENTS.md           # This root context file
+```
 
-Database: PostgreSQL (connected via Docker locally, cloud-hosted in production).
+---
 
-Build Tool: Gradle or Maven (configured with wrapper).
+## ⚡ Core Engineering Principles
 
-IDE: IntelliJ IDEA Community.
+1. **Clean Architecture**: Strict separation of concerns (Domain, Data, Presentation) across mobile and backend layers. Business logic resides in pure Kotlin domain modules with zero framework dependencies.
+2. **Docs-as-Code**: Architectural decisions, testing guidelines, and technical debt must be kept up to date in `/docs` and `AGENTS.md`.
+3. **English Code**: All code, identifiers, comments, documentation, and git commit messages must be in English. User-facing strings must reside in localization resource files (`strings.xml`), never hardcoded in code.
+4. **No Hardcoded Secrets**: Never commit credentials, tokens, or private keys. Always use environment variables (`.env`).
+5. **Monorepo Modularity**: Maintain strict module boundaries. Never leak backend dependencies into mobile modules or vice-versa.
 
-Mobile (/mobile)
-Framework: Kotlin Multiplatform with Compose Multiplatform.
+---
 
-IDE: Android Studio.
+## 📖 Sub-Project Documentation
 
-UI/UX: Declarative UI using Jetpack/Compose Multiplatform paradigms.
-
-3. Engineering Guidelines for AI Code Generation
-When generating or modifying code in this repository, always adhere to the following rules:
-
-Idiomatic Kotlin: Use modern Kotlin features (coroutines, flows, data classes, immutability by default) where appropriate.
-
-Error Handling: Avoid empty catch blocks. Use structured result types or proper exception handling patterns.
-
-No Hardcoded Secrets: Never generate hardcoded database credentials, API keys, or tokens. Always rely on environment variables (.env or system properties).
-
-Modularity: Respect the monorepo boundaries. Do not leak backend logic into the mobile shared module or vice-versa.
+- **Mobile Client**: See [`mobile/AGENTS.md`](mobile/AGENTS.md) for mobile workflows, Gradle commands, and presentation rules.
+- **Backend Service**: See [`backend/architecture.md`](backend/architecture.md) for Spring Boot conventions and database patterns.
+- **System Architecture**: Detailed KMP layer and presentation breakdown in [`docs/architecture.md`](docs/architecture.md).
+- **Testing Guidelines**: Testing strategy, Turbine usage, and test doubles in [`docs/testing.md`](docs/testing.md).
+- **Backlog & Technical Debt**: Tracked debt items and roadmap in [`docs/todo.md`](docs/todo.md).
