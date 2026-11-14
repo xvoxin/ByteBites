@@ -20,6 +20,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import pl.bytebites.mobile.presentation.resource.StringValue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecipeDetailScreenViewModelTest {
@@ -81,6 +83,34 @@ class RecipeDetailScreenViewModelTest {
             val effect = awaitItem()
             assertEquals(RecipeDetailEffect.NavigateBack, effect)
         }
+    }
+
+    @Test
+    fun `when recipe detail loading fails, update errorDialog state and set isLoading to false`() = runTest {
+        repository.errorToThrow = RuntimeException("Failed to load recipe details")
+
+        viewModel.errorDialog.test {
+            viewModel.onIntent(RecipeDetailIntent.LoadRecipeDetail("recipe_100"))
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            val errorState = expectMostRecentItem()
+            assertNotNull(errorState, "errorDialog state should not be null on failure")
+            assertEquals(StringValue.Const("Failed to load recipe details"), errorState.message)
+            assertFalse(viewModel.state.value.isLoading, "isLoading should be false after error")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when error is dismissed, errorDialog state resets to null`() = runTest {
+        repository.errorToThrow = RuntimeException("Failed to load recipe details")
+        viewModel.onIntent(RecipeDetailIntent.LoadRecipeDetail("recipe_100"))
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNotNull(viewModel.errorDialog.value, "errorDialog should be present before dismissal")
+        viewModel.dismissError()
+
+        assertNull(viewModel.errorDialog.value, "errorDialog should be null after dismissal")
     }
 
 }
