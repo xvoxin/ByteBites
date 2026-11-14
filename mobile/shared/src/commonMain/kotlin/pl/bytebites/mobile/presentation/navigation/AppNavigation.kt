@@ -3,6 +3,7 @@ package pl.bytebites.mobile.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 import pl.bytebites.mobile.presentation.screen.feed.view.FeedScreen
 import pl.bytebites.mobile.presentation.screen.feed.viewmodel.FeedViewModel
 import pl.bytebites.mobile.presentation.screen.profile.view.ProfileScreen
@@ -27,7 +28,7 @@ fun AppNavigation(
     ) { key ->
         when (key) {
             is NavKey.Feed -> {
-                val viewModel: FeedViewModel = koinInject()
+                val viewModel: FeedViewModel = koinViewModel()
                 FeedScreen(
                     viewModel = viewModel,
                     onNavigateToDetail = { recipeId ->
@@ -40,7 +41,7 @@ fun AppNavigation(
             }
 
             is NavKey.RecipeDetail -> {
-                val viewModel: RecipeDetailViewModel = koinInject()
+                val viewModel: RecipeDetailViewModel = koinViewModel()
                 RecipeDetailScreen(
                     recipeId = key.recipeId,
                     viewModel = viewModel,
@@ -51,7 +52,7 @@ fun AppNavigation(
             }
 
             is NavKey.Profile -> {
-                val viewModel: ProfileViewModel = koinInject()
+                val viewModel: ProfileViewModel = koinViewModel()
                 ProfileScreen(
                     viewModel = viewModel,
                     onNavigateBack = {
