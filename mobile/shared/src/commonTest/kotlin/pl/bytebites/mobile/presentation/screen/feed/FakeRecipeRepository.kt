@@ -2,7 +2,8 @@ package pl.bytebites.mobile.presentation.screen.feed
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import pl.bytebites.mobile.domain.model.Recipe
 import pl.bytebites.mobile.domain.repository.RecipeRepository
@@ -11,9 +12,17 @@ class FakeRecipeRepository(
     initialRecipes: List<Recipe> = emptyList()
 ) : RecipeRepository {
 
-    private val recipesFlow = MutableStateFlow(initialRecipes)
+    val recipesFlow = MutableStateFlow(initialRecipes)
+    var errorToThrow: Throwable? = null
 
-    override fun getRecipes(): Flow<List<Recipe>> = recipesFlow.asStateFlow()
+    override fun getRecipes(): Flow<List<Recipe>> = flow {
+        val error = errorToThrow
+        if (error != null) {
+            throw error
+        } else {
+            emitAll(recipesFlow)
+        }
+    }
 
     override fun getFeaturedRecipe(): Flow<Recipe?> {
         return recipesFlow.map { list -> list.firstOrNull { it.isFeatured } }

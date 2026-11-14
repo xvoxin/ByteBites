@@ -18,6 +18,9 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import pl.bytebites.mobile.presentation.resource.StringValue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FeedScreenViewModelTest {
@@ -91,6 +94,33 @@ class FeedScreenViewModelTest {
             val effect = awaitItem()
             assertEquals(FeedEffect.NavigateToProfile, effect)
         }
+    }
+
+    @Test
+    fun `when recipes loading fails, update errorDialog state and set isLoading to false`() = runTest {
+        repository.errorToThrow = RuntimeException("Failed to fetch recipes")
+        val failingViewModel = FeedScreenViewModel(interactor)
+
+        failingViewModel.errorDialog.test {
+            testDispatcher.scheduler.advanceUntilIdle()
+
+            val errorState = expectMostRecentItem()
+            assertNotNull(errorState, "errorDialog state should not be null on failure")
+            assertEquals(StringValue.Const("Failed to fetch recipes"), errorState.message)
+            assertFalse(failingViewModel.state.value.isLoading, "isLoading should be false after error")
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when error is dismissed, errorDialog state resets to null`() = runTest {
+        repository.errorToThrow = RuntimeException("Failed to fetch recipes")
+        val failingViewModel = FeedScreenViewModel(interactor)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        failingViewModel.dismissError()
+
+        assertNull(failingViewModel.errorDialog.value)
     }
 
 }

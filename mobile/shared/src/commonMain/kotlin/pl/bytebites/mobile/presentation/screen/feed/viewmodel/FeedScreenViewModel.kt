@@ -4,17 +4,21 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pl.bytebites.mobile.presentation.error.DefaultErrorHandler
+import pl.bytebites.mobile.presentation.error.ErrorHandler
 import pl.bytebites.mobile.presentation.screen.feed.interactor.FeedProvider
 import pl.bytebites.mobile.presentation.screen.feed.model.FeedEffect
 import pl.bytebites.mobile.presentation.screen.feed.model.FeedIntent
 import pl.bytebites.mobile.presentation.screen.feed.model.FeedState
 
 class FeedScreenViewModel(
-    private val feedProvider: FeedProvider
-) : FeedViewModel() {
+    private val feedProvider: FeedProvider,
+    errorHandler: ErrorHandler = DefaultErrorHandler()
+) : FeedViewModel(), ErrorHandler by errorHandler {
 
     override val state = MutableStateFlow(FeedState(isLoading = true))
 
@@ -43,15 +47,20 @@ class FeedScreenViewModel(
 
     private fun loadRecipes() {
         viewModelScope.launch {
-            feedProvider.getRecipes().collect { recipes ->
-                state.update {
-                    it.copy(
-                        recipes = recipes,
-                        isLoading = false,
-                        error = null
-                    )
+            feedProvider.getRecipes()
+                .catch { throwable ->
+                    showError(throwable)
+                    state.update { it.copy(isLoading = false) }
                 }
-            }
+                .collect { recipes ->
+                    state.update {
+                        it.copy(
+                            recipes = recipes,
+                            isLoading = false,
+                            error = null
+                        )
+                    }
+                }
         }
     }
 
