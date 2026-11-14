@@ -7,22 +7,8 @@ import bytebites.shared.generated.resources.error_default_title
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import pl.bytebites.mobile.presentation.resource.StringValue
-
-fun <T> Flow<T>.catchToError(
-    errorHandler: ErrorHandler,
-    title: StringValue = StringValue.Resource(Res.string.error_default_title)
-): Flow<T> = catch { throwable ->
-    errorHandler.showError(throwable, title)
-}
-
-fun <T> Flow<T>.catchToError(
-    errorHandler: ErrorHandler,
-    title: String
-): Flow<T> = catchToError(errorHandler, StringValue.Const(title))
 
 fun <VM> VM.launchSafe(
     title: StringValue = StringValue.Resource(Res.string.error_default_title),

@@ -118,9 +118,10 @@ class FeedScreenViewModelTest {
         val failingViewModel = FeedScreenViewModel(interactor)
         testDispatcher.scheduler.advanceUntilIdle()
 
+        assertNotNull(failingViewModel.errorDialog.value, "errorDialog should be present before dismissal")
         failingViewModel.dismissError()
 
-        assertNull(failingViewModel.errorDialog.value)
+        assertNull(failingViewModel.errorDialog.value, "errorDialog should be null after dismissal")
     }
 
 }

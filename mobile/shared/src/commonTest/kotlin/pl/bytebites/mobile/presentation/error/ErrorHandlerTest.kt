@@ -5,7 +5,6 @@ import bytebites.shared.generated.resources.Res
 import bytebites.shared.generated.resources.error_default_message
 import bytebites.shared.generated.resources.error_default_title
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.runTest
 import pl.bytebites.mobile.presentation.resource.StringValue
 import kotlin.test.Test
@@ -152,53 +151,6 @@ class ErrorHandlerTest {
 
             val dismissedState = awaitItem()
             assertNull(dismissedState)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `catchToError operator intercepts flow exception and forwards to errorHandler`() = runTest {
-        val failingFlow = flow<String> {
-            emit("First item")
-            throw RuntimeException("Network timeout")
-        }
-
-        errorHandler.errorDialog.test {
-            assertEquals(null, awaitItem())
-
-            failingFlow
-                .catchToError(errorHandler)
-                .test {
-                    assertEquals("First item", awaitItem())
-                    awaitComplete()
-                }
-
-            val errorState = awaitItem()
-            assertNotNull(errorState)
-            assertEquals(StringValue.Resource(Res.string.error_default_title), errorState.title)
-            assertEquals(StringValue.Const("Network timeout"), errorState.message)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `catchToError with custom title updates errorDialog state with custom title`() = runTest {
-        val failingFlow = flow<String> {
-            throw RuntimeException("Network timeout")
-        }
-
-        errorHandler.errorDialog.test {
-            assertEquals(null, awaitItem())
-
-            failingFlow
-                .catchToError(errorHandler, title = "Custom Title")
-                .test {
-                    awaitComplete()
-                }
-
-            val errorState = awaitItem()
-            assertNotNull(errorState)
-            assertEquals(StringValue.Const("Custom Title"), errorState.title)
             cancelAndIgnoreRemainingEvents()
         }
     }
