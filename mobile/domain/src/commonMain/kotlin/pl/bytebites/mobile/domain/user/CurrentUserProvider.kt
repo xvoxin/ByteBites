@@ -16,7 +16,7 @@ class RepositoryCurrentUserProvider(
     private val authRepository: AuthRepository
 ) : CurrentUserProvider {
 
-    override fun provide(): Flow<QueryState<User?>> = 
+    override fun provide(): Flow<QueryState<User?>> =
         queryFlow {
             authRepository.getCurrentUser()
         }

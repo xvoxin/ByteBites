@@ -4,7 +4,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-fun <T> queryFlow(block: suspend () -> Result<T>): Flow<QueryState<T>> = 
+fun <T> queryFlow(block: suspend () -> Result<T>): Flow<QueryState<T>> =
     flow {
         try {
             block().fold(
@@ -18,7 +18,7 @@ fun <T> queryFlow(block: suspend () -> Result<T>): Flow<QueryState<T>> =
         }
     }
 
-fun commandFlow(block: suspend () -> Result<Unit>): Flow<CommandState> = 
+fun commandFlow(block: suspend () -> Result<Unit>): Flow<CommandState> =
     flow {
         try {
             block().fold(

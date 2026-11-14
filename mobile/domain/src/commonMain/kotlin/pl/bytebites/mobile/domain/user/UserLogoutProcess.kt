@@ -15,7 +15,7 @@ class SessionTerminationProcess(
     private val authRepository: AuthRepository
 ) : UserLogoutProcess {
 
-    override fun logout(): Flow<CommandState> = 
+    override fun logout(): Flow<CommandState> =
         commandFlow {
             authRepository.logout()
         }

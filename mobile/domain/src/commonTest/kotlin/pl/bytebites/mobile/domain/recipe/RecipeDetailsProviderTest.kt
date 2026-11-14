@@ -54,14 +54,14 @@ class RecipeDetailsProviderTest {
 
     private fun sampleRecipe() = Recipe(
         id = "1",
-        title = "Szarlotka",
+        title = "Apple Pie",
         prepTime = "45 min",
-        difficulty = "Średnie",
+        difficulty = "Medium",
         rating = 4.8,
         servings = 4,
-        description = "Pyszne ciasto",
-        ingredients = listOf("Jabłka", "Mąka"),
-        steps = listOf("Upiecz")
+        description = "Delicious pie",
+        ingredients = listOf("Apples", "Flour"),
+        steps = listOf("Bake")
     )
 
 }

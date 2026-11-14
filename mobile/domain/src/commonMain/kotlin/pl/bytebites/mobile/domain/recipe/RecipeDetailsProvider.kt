@@ -16,7 +16,7 @@ class RepositoryRecipeDetailsProvider(
     private val recipeRepository: RecipeRepository
 ) : RecipeDetailsProvider {
 
-    override fun provide(id: String): Flow<QueryState<Recipe?>> = 
+    override fun provide(id: String): Flow<QueryState<Recipe?>> =
         queryFlow {
             recipeRepository.getRecipeById(id)
         }
